@@ -2,16 +2,17 @@ import React, { useState, useRef } from 'react';
 import { 
   UploadCloud, 
   FileText, 
-  File, 
   Sparkles, 
   CheckCircle2, 
   RefreshCw, 
-  Layers, 
   AlertCircle,
-  Building,
-  ArrowRight
+  ArrowRight,
+  SlidersHorizontal,
+  Layers,
+  FileCheck,
+  Check
 } from 'lucide-react';
-import { SampleTender, DocumentAnalysisResult } from '../types';
+import type { SampleTender, DocumentAnalysisResult } from '../types';
 import { ApiService } from '../services/api';
 
 interface TenderAnalysisViewProps {
@@ -38,12 +39,12 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const pipelineSteps = [
-    "Ingesting Document & Cleaning Technical Specification Text...",
-    "Running NLP Entity Extractor for IS Numbers, Grades & Materials...",
-    "Querying Indian Standards Revision Timeline & Quality Control Orders (QCO)...",
-    "Evaluating Specification Compatibility Matrix & Semantic Similarity...",
-    "Synthesizing Explainable AI Rationale & Composite Confidence Scoring..."
+  const pipelineStages = [
+    { label: "Document Ingestion & Text Preprocessing", desc: "Sanitizing clauses, removing formatting artifacts" },
+    { label: "NLP Entity Extraction & Parameter Parsing", desc: "Detecting IS codes, material grades, tolerances" },
+    { label: "Temporal Revision Graph Check", desc: "Cross-referencing active edition years & QCO mandates" },
+    { label: "Specification Compatibility Matrix", desc: "Evaluating tensile strength, composition & test protocols" },
+    { label: "Explainable Recommendation & Confidence Scoring", desc: "Synthesizing 5-point evidence rationale" }
   ];
 
   const handleSelectSample = (sample: SampleTender) => {
@@ -65,11 +66,11 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
 
   const handleRunAnalysis = async () => {
     if (inputMode === 'paste' && tenderText.trim().length < 15) {
-      setErrorMessage("Please paste or type at least 15 characters of tender technical specification text.");
+      setErrorMessage("Please enter at least 15 characters of tender specification text.");
       return;
     }
     if (inputMode === 'upload' && !uploadedFile) {
-      setErrorMessage("Please select a valid PDF, DOCX, or TXT tender document.");
+      setErrorMessage("Please upload a PDF, DOCX, or TXT tender document.");
       return;
     }
 
@@ -77,9 +78,9 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
     setIsAnalyzing(true);
     setAnalysisStep(0);
 
-    // Step animation interval
-    const stepInterval = setInterval(() => {
-      setAnalysisStep(prev => (prev < pipelineSteps.length - 1 ? prev + 1 : prev));
+    // Progressive stage animation
+    const stageInterval = setInterval(() => {
+      setAnalysisStep(prev => (prev < pipelineStages.length - 1 ? prev + 1 : prev));
     }, 450);
 
     try {
@@ -98,124 +99,130 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
           categoryHint !== 'all' ? categoryHint : undefined,
           tenderRef || undefined,
           issuingAuthority || undefined,
-          selectedSample ? `${selectedSample.id}.txt` : "Pasted_Tender_Spec.txt"
+          selectedSample ? `${selectedSample.id}.txt` : "Tender_Specification.txt"
         );
       }
 
-      clearInterval(stepInterval);
-      setAnalysisStep(pipelineSteps.length - 1);
+      clearInterval(stageInterval);
+      setAnalysisStep(pipelineStages.length - 1);
 
-      // Short delay to let user see final check
       setTimeout(() => {
         setIsAnalyzing(false);
         onAnalysisComplete(result);
       }, 500);
 
     } catch (err: any) {
-      clearInterval(stepInterval);
+      clearInterval(stageInterval);
       setIsAnalyzing(false);
-      setErrorMessage(err.message || "An error occurred during analysis. Please retry.");
+      setErrorMessage(err.message || "Analysis could not be completed. Please verify document formatting.");
     }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
-      {/* Top Banner */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
-              <span>Tender Specification Analysis Studio</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Upload an official procurement document (PDF/DOCX) or paste technical clause text to extract applicable Indian Standards (IS).
-            </p>
-          </div>
-
-          {/* Quick Presets Picker */}
+    <div className="space-y-6 max-w-6xl mx-auto pb-16 animate-page-enter">
+      {/* Top Header */}
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 shrink-0">Sample Presets:</span>
-            <select
-              className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              onChange={(e) => {
-                const s = sampleTenders.find(t => t.id === e.target.value);
-                if (s) handleSelectSample(s);
-              }}
-              defaultValue={selectedSample?.id || ""}
+            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+              Module: IS-Verification
+            </span>
+            <span className="text-xs text-slate-400">SIH26108 Workspace</span>
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 mt-1">
+            Tender Specification Analysis Studio
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Ingest procurement bid specifications to extract technical parameters, detect cited standards, and verify against active BIS editions.
+          </p>
+        </div>
+
+        {/* Preset Selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-600 shrink-0">Sample Presets:</span>
+          <select
+            className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 font-medium text-slate-800 focus:ring-1 focus:ring-slate-800 focus:outline-none"
+            onChange={(e) => {
+              const s = sampleTenders.find(t => t.id === e.target.value);
+              if (s) handleSelectSample(s);
+            }}
+            defaultValue={selectedSample?.id || ""}
+          >
+            <option value="" disabled>Load a realistic tender...</option>
+            {sampleTenders.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.category}: {s.title.substring(0, 34)}...
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Main Workspace Layout (Left: Input & Metadata | Right: Live Pipeline Status & Guidance) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Form (7 cols) */}
+        <div className="lg:col-span-7 bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
+          {/* Mode Switcher */}
+          <div className="flex border-b border-slate-200">
+            <button
+              onClick={() => setInputMode('paste')}
+              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-all ${
+                inputMode === 'paste'
+                  ? 'border-slate-900 text-slate-900'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
             >
-              <option value="" disabled>Choose a realistic tender...</option>
-              {sampleTenders.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.category}: {s.title.substring(0, 36)}...
-                </option>
-              ))}
-            </select>
+              Paste Specification Clauses
+            </button>
+            <button
+              onClick={() => setInputMode('upload')}
+              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-all ${
+                inputMode === 'upload'
+                  ? 'border-slate-900 text-slate-900'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Upload Document (PDF / DOCX)
+            </button>
           </div>
-        </div>
 
-        {/* Input Mode Selector */}
-        <div className="mt-6 flex border-b border-slate-200">
-          <button
-            onClick={() => setInputMode('paste')}
-            className={`pb-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all ${
-              inputMode === 'paste'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            Paste Specification Text
-          </button>
-          <button
-            onClick={() => setInputMode('upload')}
-            className={`pb-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all ${
-              inputMode === 'upload'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            Upload Document (PDF / DOCX / TXT)
-          </button>
-        </div>
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
-        {/* Error Alert */}
-        {errorMessage && (
-          <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Main Input Form */}
-        <div className="mt-6 space-y-4">
+          {/* Input Area */}
           {inputMode === 'paste' ? (
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Tender Specification & Clauses
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Tender Specification Text
               </label>
               <textarea
-                rows={7}
+                rows={8}
                 value={tenderText}
                 onChange={(e) => setTenderText(e.target.value)}
-                placeholder="Paste tender text here, e.g. 'Supply of High Strength Deformed Steel Bars Fe 500D conforming to IS 1786:2008 with min 16% elongation and max 0.075% S+P...'"
-                className="w-full text-xs sm:text-sm font-sans p-3.5 bg-slate-50/70 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                placeholder="Paste tender specification clauses here (e.g. 'Supply of High Strength Deformed Steel Bars Fe 500D conforming to IS 1786:2008 with min 16% elongation...')"
+                className="w-full text-xs font-mono p-3 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-1 focus:ring-slate-800 focus:outline-none transition-all leading-relaxed"
               />
               <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
-                <span>Supports natural technical tender clauses, product descriptions, test criteria & IS codes</span>
+                <span>Accepts unstructured text, technical tables, and standard references</span>
                 <span>{tenderText.length} characters</span>
               </div>
             </div>
           ) : (
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Upload Tender Document
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Upload Procurement Document
               </label>
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
                   uploadedFile
-                    ? 'border-emerald-400 bg-emerald-50/30'
-                    : 'border-slate-300 hover:border-blue-500 bg-slate-50/50 hover:bg-blue-50/30'
+                    ? 'border-emerald-500 bg-emerald-50/20'
+                    : 'border-slate-300 hover:border-slate-400 bg-slate-50/50'
                 }`}
               >
                 <input
@@ -225,26 +232,24 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
                   accept=".pdf,.docx,.doc,.txt"
                   className="hidden"
                 />
-                <div className="w-12 h-12 mx-auto rounded-full bg-blue-100/70 flex items-center justify-center text-blue-600 mb-3">
-                  <UploadCloud className="w-6 h-6" />
-                </div>
+                <UploadCloud className="w-8 h-8 mx-auto text-slate-400 mb-2" />
                 {uploadedFile ? (
                   <div>
-                    <p className="text-sm font-bold text-emerald-700 flex items-center justify-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4" />
+                    <p className="text-xs font-bold text-emerald-800 flex items-center justify-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>{uploadedFile.name}</span>
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {(uploadedFile.size / 1024).toFixed(1)} KB • Click to change file
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      {(uploadedFile.size / 1024).toFixed(1)} KB • Click to choose different file
                     </p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-semibold text-slate-700">
-                      Click to upload or drag & drop tender document
+                    <p className="text-xs font-semibold text-slate-700">
+                      Click to upload or drag & drop tender PDF/DOCX
                     </p>
-                    <p className="text-xs text-slate-400 mt-1">
-                      PDF, Word (.docx), or plain text (Max 15MB)
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Supports Adobe PDF, Microsoft Word, Plain Text (Max 15MB)
                     </p>
                   </div>
                 )}
@@ -252,18 +257,18 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
             </div>
           )}
 
-          {/* Metadata Parameters Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          {/* Context Metadata Inputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Product Category Hint (Optional)
+              <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                Product Category Hint
               </label>
               <select
                 value={categoryHint}
                 onChange={(e) => setCategoryHint(e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium text-slate-800 focus:ring-1 focus:ring-slate-800 focus:outline-none"
               >
-                <option value="all">Auto-Detect Domain (Recommended)</option>
+                <option value="all">Auto-Detect Category</option>
                 <option value="Construction & Structural">Construction & Structural</option>
                 <option value="Electrical & Cables">Electrical & Cables</option>
                 <option value="Safety & PPE">Safety & PPE</option>
@@ -276,102 +281,132 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Tender Reference Number (Optional)
+              <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                Tender Reference (Optional)
               </label>
               <input
                 type="text"
                 value={tenderRef}
                 onChange={(e) => setTenderRef(e.target.value)}
-                placeholder="e.g. GeM/2024/B/492109"
-                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-mono text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="e.g. GeM/2024/B/4921"
+                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-mono text-slate-800 focus:ring-1 focus:ring-slate-800 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Issuing Authority / PSU (Optional)
+              <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                Authority / PSU (Optional)
               </label>
               <input
                 type="text"
                 value={issuingAuthority}
                 onChange={(e) => setIssuingAuthority(e.target.value)}
-                placeholder="e.g. State PWD / CPWD / NHPC"
-                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="e.g. CPWD Bridges"
+                className="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 text-slate-800 focus:ring-1 focus:ring-slate-800 focus:outline-none"
               />
             </div>
           </div>
 
-          {/* Submit Action */}
-          <div className="pt-3">
+          {/* Action Button */}
+          <div className="pt-2">
             <button
               onClick={handleRunAnalysis}
               disabled={isAnalyzing}
-              className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 shadow-lg transition-all ${
+              className={`w-full py-2.5 px-4 rounded-lg font-semibold text-xs text-white flex items-center justify-center gap-2 shadow-xs transition-all ${
                 isAnalyzing
                   ? 'bg-slate-700 cursor-not-allowed opacity-90'
-                  : 'bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-600 hover:from-blue-600 hover:to-indigo-600 shadow-blue-900/30 active:scale-[0.99]'
+                  : 'bg-slate-900 hover:bg-slate-800 active:scale-[0.99]'
               }`}
             >
               {isAnalyzing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Processing Through AI Pipeline...</span>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Processing Analysis Pipeline...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Run AI Standards Verification & Recommendation</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Run Standards Verification & Recommendation</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-0.5 text-slate-400" />
                 </>
               )}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Progressive AI Pipeline Execution Animation */}
-      {isAnalyzing && (
-        <div className="bg-slate-900 rounded-2xl p-6 text-white border border-blue-800 shadow-xl animate-fadeIn">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
-              <h3 className="text-sm font-bold tracking-wide uppercase text-blue-300">
-                Executing AI Recommendation Pipeline
+        {/* Right Guidance & Execution Stepper (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Real-time Pipeline Execution Panel */}
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                <span>Verification Pipeline Stages</span>
               </h3>
+              <span className="text-[10px] font-mono text-slate-400">
+                {isAnalyzing ? `Active: Stage ${analysisStep + 1}/5` : 'Standby'}
+              </span>
             </div>
-            <span className="text-xs font-mono text-slate-400">Step {analysisStep + 1} of {pipelineSteps.length}</span>
+
+            <div className="space-y-2.5">
+              {pipelineStages.map((stage, idx) => {
+                const isCompleted = isAnalyzing ? idx < analysisStep : false;
+                const isCurrent = isAnalyzing && idx === analysisStep;
+
+                return (
+                  <div 
+                    key={idx}
+                    className={`p-2.5 rounded-lg border text-xs transition-all ${
+                      isCurrent 
+                        ? 'bg-sky-50/70 border-sky-300 text-sky-950 font-medium' 
+                        : (isCompleted 
+                            ? 'bg-emerald-50/50 border-emerald-200 text-emerald-950' 
+                            : 'bg-slate-50/50 border-slate-200 text-slate-500')
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        ) : isCurrent ? (
+                          <RefreshCw className="w-3.5 h-3.5 text-sky-600 animate-spin shrink-0" />
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full border border-slate-300 flex items-center justify-center text-[9px] font-mono text-slate-400">
+                            {idx + 1}
+                          </span>
+                        )}
+                        <span className="font-semibold text-slate-800">{stage.label}</span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-slate-500 ml-5.5 mt-0.5">{stage.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {pipelineSteps.map((stepText, idx) => {
-              const isDone = idx < analysisStep;
-              const isCurrent = idx === analysisStep;
-              return (
-                <div 
-                  key={idx}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg text-xs transition-all ${
-                    isCurrent 
-                      ? 'bg-blue-950/80 border border-blue-500/50 text-blue-200' 
-                      : (isDone ? 'text-emerald-300 opacity-80' : 'text-slate-600')
-                  }`}
-                >
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0">
-                    {isDone ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    ) : isCurrent ? (
-                      <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-slate-700"></span>
-                    )}
-                  </div>
-                  <span className="font-medium">{stepText}</span>
-                </div>
-              );
-            })}
+          {/* Quick Regulatory Guidance */}
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs space-y-2">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+              Procurement Audit Checklist
+            </h4>
+            <ul className="space-y-1.5 text-[11px] text-slate-600">
+              <li className="flex items-start gap-1.5">
+                <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Verify that standard year matches active BIS gazette.</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Ensure mandatory QCO compliance clause is attached.</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Record officer signoff in audit log prior to bid release.</span>
+              </li>
+            </ul>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

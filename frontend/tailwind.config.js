@@ -7,30 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        gov: {
-          50: '#f0f5fa',
-          100: '#e1ecf5',
-          200: '#c3d9eb',
-          300: '#95bedc',
-          400: '#609dc9',
-          500: '#3b81b3',
-          600: '#2b6898',
-          700: '#24547c',
-          800: '#1e405f',
-          900: '#0f2942',
-          950: '#091a2c',
+        brand: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
+          950: '#0a0f1d',
         },
-        bis: {
-          blue: '#0d3b66',
-          gold: '#f4d35e',
-          amber: '#ee964b',
-          crimson: '#f95738',
-          teal: '#007f73',
-          navy: '#13293d',
+        navy: {
+          50: '#f0f4f8',
+          100: '#d9e2ec',
+          200: '#bcccdc',
+          300: '#9fb3c8',
+          400: '#829ab1',
+          500: '#627d98',
+          600: '#486581',
+          700: '#334e68',
+          800: '#243b53',
+          900: '#102a43',
+          950: '#0b1d30',
+        },
+        accent: {
+          teal: '#0d9488',
+          cyan: '#0284c7',
+          blue: '#1d4ed8',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
+      boxShadow: {
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.07)',
+        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06)',
       }
     },
   },

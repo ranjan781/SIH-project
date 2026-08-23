@@ -7,191 +7,206 @@ import {
   Database, 
   GitBranch, 
   Sparkles, 
-  CheckCircle2, 
   ShieldCheck, 
-  ArrowDown, 
   ChevronRight,
-  BookOpen
+  BookOpen,
+  ArrowRight
 } from 'lucide-react';
 
 export const PipelineMethodologyView: React.FC = () => {
-  const [selectedStep, setSelectedStep] = useState<number>(0);
+  const [activeNode, setActiveNode] = useState<number>(0);
 
-  const pipelineSteps = [
+  const pipelineNodes = [
     {
-      step: 1,
-      title: "Tender Document Ingestion & Parsing",
-      icon: <FileText className="w-5 h-5 text-blue-600" />,
-      shortDesc: "Extracts text from PDF, DOCX, and raw specification text.",
-      techStack: "PyPDF, python-docx, Regular Expressions, String Cleaners",
-      detail: "Ingests unstructured procurement documents. Strips non-printable ASCII noise, normalizes line breaks, and extracts structured clauses from tender tables, scope summaries, and technical annexures."
+      id: 0,
+      name: "Document Ingestion",
+      icon: <FileText className="w-4 h-4" />,
+      whatItDoes: "Parses PDF, DOCX, and text procurement documents, strips ASCII control noise, and standardizes technical clause formatting.",
+      input: "Unstructured tender files (PDF / DOCX / TXT)",
+      output: "Sanitized clean technical clause text stream",
+      tech: "PyPDF, python-docx, ASCII RegEx cleaners"
     },
     {
-      step: 2,
-      title: "NLP Entity & Specification Extraction",
-      icon: <Code className="w-5 h-5 text-indigo-600" />,
-      shortDesc: "Extracts product identity, materials, grades, dimensions & tests.",
-      techStack: "Rule-based Named Entity Recognition (NER), Custom Regex Matchers",
-      detail: "Identifies procurement entities such as product classifications (e.g. TMT Steel, HDPE Pipes), material grades (Fe 500D, PE 100, Class A), dimensional limits, tensile strength, and quality test clauses."
+      id: 1,
+      name: "NLP Entity Extraction",
+      icon: <Code className="w-4 h-4" />,
+      whatItDoes: "Extracts product identity, procurement categories, materials, grades, dimensions, and testing constraints.",
+      input: "Clean clause text",
+      output: "Structured entities (Grade: Fe 500D, Material: TMT Steel)",
+      tech: "Custom Named Entity Recognition (NER) automata"
     },
     {
-      step: 3,
-      title: "IS Reference Detection & Regex Normalization",
-      icon: <Cpu className="w-5 h-5 text-sky-600" />,
-      shortDesc: "Matches all Indian Standard (IS) notation variations.",
-      techStack: "Deterministic Regex Automata (`IS \\d+(?:\\(Part \\d+\\))?(?::\\d{4})?`)",
-      detail: "Detects various IS notations (e.g., IS 9873(P-4):2017, IS:1786-2008) and decomposes them into standard base numbers, part numbers, and cited publication years."
+      id: 2,
+      name: "IS Regex Normalizer",
+      icon: <Cpu className="w-4 h-4" />,
+      whatItDoes: "Decomposes and normalizes heterogeneous standard notations (e.g. IS 9873(P-4):2017) into canonical base numbers and cited years.",
+      input: "Tender strings matching IS pattern variations",
+      output: "Base IS, Part, and publication year tuple",
+      tech: "Deterministic RegEx Automata"
     },
     {
-      step: 4,
-      title: "Semantic Vector & Keyword Retrieval",
-      icon: <Database className="w-5 h-5 text-emerald-600" />,
-      shortDesc: "Dense semantic matching against the Indian Standards dataset.",
-      techStack: "TF-IDF Weighted Cosine Similarity / Sentence-Transformers",
-      detail: "Computes cosine similarity between tender product descriptions and standard titles, scopes, and technical keywords to surface all candidate standards."
+      id: 3,
+      name: "Revision Knowledge Graph",
+      icon: <GitBranch className="w-4 h-4" />,
+      whatItDoes: "Cross-checks cited standard editions against historical revision timelines to detect superseded or withdrawn standards.",
+      input: "Cited IS base number and year",
+      output: "Active current replacement standard & QCO order",
+      tech: "Temporal Revision Graph Traversal"
     },
     {
-      step: 5,
-      title: "Standards Revision Timeline & QCO Graph",
-      icon: <GitBranch className="w-5 h-5 text-amber-600" />,
-      shortDesc: "Detects superseded revisions and withdrawn standards.",
-      techStack: "Graph Revision Traversal & Bureau of Indian Standards (BIS) Catalog",
-      detail: "Cross-checks cited standard editions against active revision timelines. If a tender cites an obsolete edition (e.g., IS 1786:1985), the engine automatically identifies the active replacement (IS 1786:2008)."
+      id: 4,
+      name: "Vector & Semantic Retrieval",
+      icon: <Database className="w-4 h-4" />,
+      whatItDoes: "Performs dense semantic vector similarity matching between extracted product requirements and candidate standards scopes.",
+      input: "Tender product description & technical keywords",
+      output: "Ranked candidate standards by cosine similarity",
+      tech: "TF-IDF Weighted Cosine Similarity"
     },
     {
-      step: 6,
-      title: "Specification Compatibility Matrix",
-      icon: <Workflow className="w-5 h-5 text-purple-600" />,
-      shortDesc: "Validates technical tolerances, chemical limits & test methods.",
-      techStack: "Multi-parameter Rule Evaluation Matrix",
-      detail: "Performs constraint verification between tender requirements (e.g., elongation 16%, MAP 50%) and standard limits, ensuring full alignment."
+      id: 5,
+      name: "Specification Compatibility Rule Engine",
+      icon: <Workflow className="w-4 h-4" />,
+      whatItDoes: "Validates technical constraints, material grades, tensile/proof stress parameters, and mandatory testing standards.",
+      input: "Extracted specs vs Standard parameter limits",
+      output: "Multi-parameter match score matrix",
+      tech: "Constraint Satisfaction Rule Matrix"
     },
     {
-      step: 7,
-      title: "Confidence Scoring Formulation",
-      icon: <Sparkles className="w-5 h-5 text-blue-600" />,
-      shortDesc: "Computes composite confidence percentage.",
-      techStack: "Weighted Composite Function: Entity + Revision + Spec + Semantic",
-      detail: "Scores candidates based on Direct Entity Match (35%), Active Revision Alignment (25%), Specification Parameter Coverage (25%), and Semantic Overlap (15%)."
+      id: 6,
+      name: "Confidence Scoring Calculator",
+      icon: <Sparkles className="w-4 h-4" />,
+      whatItDoes: "Computes composite confidence score C(S, T) weighting entity match, revision status, specification alignment, and semantic overlap.",
+      input: "Individual component sub-scores",
+      output: "Composite confidence percentage (0% - 100%)",
+      tech: "Multi-Objective Weighted Scoring Function"
     },
     {
-      step: 8,
-      title: "Explainable AI (XAI) Rationale Generator",
-      icon: <BookOpen className="w-5 h-5 text-teal-600" />,
-      shortDesc: "Produces 5-point evidence rationale and rejection reasons.",
-      techStack: "Natural Language Rationale Synthesizer",
-      detail: "Generates clear, transparent justifications for procurement officers, articulating why the standard was recommended and why older editions were rejected."
+      id: 7,
+      name: "Explainable AI (XAI) Generator",
+      icon: <BookOpen className="w-4 h-4" />,
+      whatItDoes: "Produces 5-point evidence-backed natural language justifications explaining why the standard was recommended and why older editions were flagged.",
+      input: "Evaluation result & gap analysis data",
+      output: "Human-readable procurement compliance report",
+      tech: "Natural Language Rationale Synthesizer"
     },
     {
-      step: 9,
-      title: "Human-in-the-Loop Signoff & Audit Logging",
-      icon: <ShieldCheck className="w-5 h-5 text-rose-600" />,
-      shortDesc: "Procurement officer review, approval, and tamper-proof log.",
-      techStack: "Role-Based Verification Workflow, Audit Log Repository",
-      detail: "Empowers the procurement officer with final discretionary authority. Records officer ID, timestamp, and verification remarks for statutory audit compliance."
+      id: 8,
+      name: "Human-in-the-Loop Signoff",
+      icon: <ShieldCheck className="w-4 h-4" />,
+      whatItDoes: "Provides authorized procurement officers with discretionary review, signoff, and tamper-evident audit logging.",
+      input: "Officer decision (Accept / Flag / Reject) & remarks",
+      output: "Official compliance certificate & audit log entry",
+      tech: "Role-Based Verification & Audit Repository"
     }
   ];
 
+  const current = pipelineNodes[activeNode];
+
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-16">
+    <div className="space-y-6 max-w-6xl mx-auto pb-16 animate-page-enter">
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <Workflow className="w-5 h-5 text-blue-600" />
-          <span>AI Architecture & Recommendation Pipeline</span>
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Detailed visual breakdown of how IS Standard Advisor processes unstructured tender documents into verifiable Indian Standard recommendations.
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+            Architecture
+          </span>
+          <span className="text-xs text-slate-400">SIH26108 Pipeline Walkthrough</span>
+        </div>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 mt-1">
+          End-to-End AI Recommendation Pipeline Architecture
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          Interactive node graph showing how unstructured tender text is ingested, parsed, verified across BIS revision graphs, and synthesized into explainable recommendations.
         </p>
       </div>
 
-      {/* Visual Pipeline Stepper */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left List */}
-        <div className="lg:col-span-5 space-y-2">
-          {pipelineSteps.map((item, idx) => {
-            const isSelected = selectedStep === idx;
+      {/* Connected Nodes Visual Flow */}
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
+        <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          Interactive Pipeline Nodes (Click any node to inspect Input / Output)
+        </h2>
+
+        {/* Nodes Horizontal / Grid Stepper */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-9 gap-2">
+          {pipelineNodes.map((node, idx) => {
+            const isActive = activeNode === idx;
             return (
-              <div
-                key={item.step}
-                onClick={() => setSelectedStep(idx)}
-                className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
-                  isSelected
-                    ? 'bg-blue-50/80 border-blue-500 shadow-sm'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
+              <button
+                key={node.id}
+                onClick={() => setActiveNode(idx)}
+                className={`p-3 rounded-lg border text-left flex flex-col justify-between transition-all card-hover-lift ${
+                  isActive
+                    ? 'bg-[#0f172a] text-white border-slate-900 shadow-sm ring-2 ring-slate-800/20'
+                    : 'bg-slate-50 hover:bg-white text-slate-700 border-slate-200'
                 }`}
               >
-                <div className={`p-2 rounded-lg shrink-0 ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}>
-                  {item.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                      Step {item.step}
-                    </span>
-                    <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-blue-600 translate-x-1' : 'text-slate-400'}`} />
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-[9px] font-mono font-bold ${isActive ? 'text-slate-300' : 'text-slate-400'}`}>
+                    0{idx + 1}
+                  </span>
+                  <div className={isActive ? 'text-sky-400' : 'text-slate-500'}>
+                    {node.icon}
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900 truncate mt-0.5">{item.title}</h4>
-                  <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{item.shortDesc}</p>
                 </div>
-              </div>
+                <div className="text-[11px] font-bold tracking-tight line-clamp-2">
+                  {node.name}
+                </div>
+              </button>
             );
           })}
         </div>
+      </div>
 
-        {/* Right Detail Pane */}
-        <div className="lg:col-span-7">
-          <div className="bg-white rounded-2xl p-6 border-2 border-blue-600/60 shadow-lg sticky top-28 space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold font-mono">
-                Pipeline Stage 0{pipelineSteps[selectedStep].step}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">SIH26108 Methodology</span>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                {pipelineSteps[selectedStep].icon}
-                <span>{pipelineSteps[selectedStep].title}</span>
-              </h3>
-              <p className="text-xs text-slate-500 mt-1 font-medium">
-                {pipelineSteps[selectedStep].shortDesc}
-              </p>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div>
-                <h4 className="font-bold text-slate-900 uppercase text-[11px] mb-1">Technical Implementation</h4>
-                <p className="text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                  {pipelineSteps[selectedStep].detail}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-slate-900 uppercase text-[11px] mb-1">Underlying Technologies & Algorithms</h4>
-                <div className="p-3 bg-slate-900 text-blue-200 rounded-xl font-mono text-[11px]">
-                  {pipelineSteps[selectedStep].techStack}
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-between items-center border-t border-slate-100 text-xs">
-              <button
-                disabled={selectedStep === 0}
-                onClick={() => setSelectedStep(prev => Math.max(0, prev - 1))}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 rounded-lg font-medium"
-              >
-                ← Previous Stage
-              </button>
-              <button
-                disabled={selectedStep === pipelineSteps.length - 1}
-                onClick={() => setSelectedStep(prev => Math.min(pipelineSteps.length - 1, prev + 1))}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-lg font-medium"
-              >
-                Next Stage →
-              </button>
-            </div>
+      {/* Node Detail Inspection Card */}
+      <div className="bg-white rounded-xl p-6 border border-slate-300 shadow-xs space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded bg-slate-900 text-white flex items-center justify-center text-xs font-mono font-bold">
+              0{current.id + 1}
+            </span>
+            <h3 className="text-base font-bold text-slate-900">{current.name}</h3>
           </div>
+          <span className="text-xs font-mono bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded font-semibold">
+            Technology: {current.tech}
+          </span>
+        </div>
+
+        <div>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">What This Stage Does</h4>
+          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-lg border border-slate-200 font-medium">
+            {current.whatItDoes}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Data Input</span>
+            <p className="font-mono text-slate-800 text-[11.5px]">{current.input}</p>
+          </div>
+
+          <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Data Output</span>
+            <p className="font-mono text-slate-800 text-[11.5px]">{current.output}</p>
+          </div>
+        </div>
+
+        {/* Stepper controls */}
+        <div className="pt-2 flex justify-between items-center border-t border-slate-100 text-xs">
+          <button
+            disabled={activeNode === 0}
+            onClick={() => setActiveNode(prev => Math.max(0, prev - 1))}
+            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 rounded-lg font-medium"
+          >
+            ← Previous Node
+          </button>
+          <span className="text-slate-400 font-mono text-[11px]">Node {activeNode + 1} of {pipelineNodes.length}</span>
+          <button
+            disabled={activeNode === pipelineNodes.length - 1}
+            onClick={() => setActiveNode(prev => Math.min(pipelineNodes.length - 1, prev + 1))}
+            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white rounded-lg font-medium"
+          >
+            Next Node →
+          </button>
         </div>
       </div>
     </div>
