@@ -6,7 +6,8 @@ import {
 } from '../types';
 import { INITIAL_STANDARDS_DATA, SAMPLE_TENDERS, DEFAULT_AUDIT_LOGS } from '../data/mockData';
 
-const API_BASE = 'http://localhost:8000/api';
+// Flask Backend API Base URL (Default port 5000)
+const API_BASE = 'http://localhost:5000/api';
 
 export class ApiService {
   private static isBackendAvailable: boolean | null = null;
@@ -49,7 +50,7 @@ export class ApiService {
           return await response.json();
         }
       } catch (err) {
-        console.warn("Backend call failed, using client-side AI engine:", err);
+        console.warn("Flask Backend call failed, using client-side AI engine:", err);
       }
     }
 
@@ -81,7 +82,7 @@ export class ApiService {
           return await response.json();
         }
       } catch (err) {
-        console.warn("Backend document upload failed, falling back to client-side text extractor:", err);
+        console.warn("Flask document upload failed, falling back to client-side text extractor:", err);
       }
     }
 

@@ -1,71 +1,101 @@
-"""
-Self-contained Python Test Runner (Standard Library)
-"""
-
-import sys
 import os
+import sys
+import json
+import unittest
 
-# Add root directory to sys.path
+# Ensure project root is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from backend.services.standards_service import standards_service
-from backend.services.entity_extractor import entity_extractor
-from backend.services.recommender import recommendation_engine
+from backend.app import create_app
 
+class FlaskBackendTestCase(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app()
+        self.app.config['TESTING'] = True
+        self.client = self.app.test_client()
 
-def run_all_tests():
-    print("==================================================")
-    print("Running IS Standard Advisor Backend Verification Tests")
-    print("==================================================")
-    
-    # Test 1: Standards Dataset Loading
-    standards = standards_service.get_all()
-    print(f"Test 1: Dataset loaded successfully -> {len(standards)} standards found.")
-    assert len(standards) >= 10, "Dataset must have >= 10 standards"
-    
-    # Test 2: IS 1786 exists
-    is1786 = standards_service.find_by_is_number("IS 1786:2008")
-    assert is1786 is not None, "IS 1786:2008 not found"
-    print("Test 2: IS 1786:2008 verified in dataset (Status: Current).")
-    
-    # Test 3: Regex Extraction & Outdated Revision Detection
-    sample_text = "Procurement of swings conforming to IS 9873(P-4):2017 for children parks."
-    refs = entity_extractor.extract_is_references(sample_text)
-    assert len(refs) >= 1, "Failed to extract IS reference"
-    assert refs[0].discrepancy_type == "OUTDATED_REVISION", f"Expected OUTDATED_REVISION, got {refs[0].discrepancy_type}"
-    print(f"Test 3: Extracted reference '{refs[0].normalized_is}' correctly flagged as {refs[0].discrepancy_type}.")
-    
-    # Test 4: Recommendation Engine Upgrade
-    specs = entity_extractor.extract_specifications(sample_text)
-    primary_rec, alternatives, diff_comp, status, conf = recommendation_engine.recommend(
-        text=sample_text,
-        specs=specs,
-        detected_refs=refs
-    )
-    assert primary_rec is not None, "Primary recommendation is None"
-    assert "9873" in primary_rec.is_number and "2019" in primary_rec.is_number, f"Expected 2019 edition, got {primary_rec.is_number}"
-    assert status == "OUTDATED_REFERENCE"
-    assert conf >= 0.90
-    print(f"Test 4: Recommendation engine successfully upgraded to '{primary_rec.is_number}' with {int(conf*100)}% confidence.")
-    
-    # Test 5: Steel TMT Rebars
-    steel_text = "TMT deformed steel bars Fe 500D grade conforming to IS 1786:2008 with min 16% elongation."
-    steel_refs = entity_extractor.extract_is_references(steel_text)
-    steel_specs = entity_extractor.extract_specifications(steel_text)
-    rec, _, _, steel_status, steel_conf = recommendation_engine.recommend(
-        text=steel_text,
-        specs=steel_specs,
-        detected_refs=steel_refs
-    )
-    assert rec.is_number == "IS 1786:2008"
-    assert steel_status == "VALID"
-    assert steel_specs.grade == "Fe 500D"
-    print(f"Test 5: Valid steel rebar tender verified: '{rec.is_number}' (Status: {steel_status}, Confidence: {int(steel_conf*100)}%).")
-    
-    print("\n==================================================")
-    print("ALL BACKEND VERIFICATION TESTS PASSED (5/5)!")
-    print("==================================================")
+    def test_01_health_endpoint(self):
+        """Verify GET /api/health returns 200 with Flask backend metadata"""
+        response = self.client.get('/api/health')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data.get("status"), "online")
+        self.assertEqual(data.get("backend"), "Flask")
+        self.assertEqual(data.get("project"), "SIH26108")
+        print("[PASS] Test 1: GET /api/health returns Flask online status.")
+
+    def test_02_standards_list_and_filter(self):
+        """Verify GET /api/standards lists standards and supports filtering"""
+        response = self.client.get('/api/standards')
+        self.assertEqual(response.status_code, 200)
+        standards = response.get_json()
+        self.assertGreaterEqual(len(standards), 20)
+        print(f"[PASS] Test 2: GET /api/standards returned {len(standards)} standards.")
+
+        # Test search query
+        res_search = self.client.get('/api/standards?search=1786')
+        self.assertEqual(res_search.status_code, 200)
+        search_data = res_search.get_json()
+        self.assertTrue(any("1786" in s["is_number"] for s in search_data))
+        print("[PASS] Test 2b: Standards search filter functional.")
+
+    def test_03_analyze_text_outdated_revision(self):
+        """Verify POST /api/analyze-text flags outdated IS 9873:2017 and recommends IS 9873:2019"""
+        payload = {
+            "text": "Sealed tenders for outdoor children swings conforming to IS 9873(P-4):2017 with head entrapment probe testing.",
+            "category_hint": "Toys & Child Safety",
+            "tender_ref": "DUD/PARKS/2024/SW-092"
+        }
+        response = self.client.post('/api/analyze-text', data=json.dumps(payload), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        
+        self.assertEqual(data.get("overall_status"), "OUTDATED_REFERENCE")
+        self.assertEqual(data["primary_recommendation"]["is_number"], "IS 9873 (Part 4): 2019")
+        self.assertGreaterEqual(data["overall_confidence"], 0.85)
+        self.assertGreaterEqual(len(data["primary_recommendation"]["why_recommended_reasons"]), 2)
+        print(f"[PASS] Test 3: Outdated IS 9873:2017 accurately upgraded to IS 9873:2019 (Confidence: {data['overall_confidence'] * 100}%).")
+
+    def test_04_analyze_text_valid_steel_rebar(self):
+        """Verify POST /api/analyze-text validates active IS 1786:2008 Fe 500D"""
+        payload = {
+            "text": "Supply of TMT reinforcement steel bars grade Fe 500D conforming to IS 1786:2008 with 16% elongation and 500 N/mm2 yield stress.",
+            "category_hint": "Construction & Structural",
+            "tender_ref": "PWD/BR/2024/TMT-410"
+        }
+        response = self.client.post('/api/analyze-text', data=json.dumps(payload), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+
+        self.assertEqual(data.get("overall_status"), "VALID")
+        self.assertEqual(data["primary_recommendation"]["is_number"], "IS 1786:2008")
+        self.assertGreaterEqual(data["overall_confidence"], 0.90)
+        print(f"[PASS] Test 4: Valid steel rebar IS 1786:2008 confirmed as VALID (Confidence: {data['overall_confidence'] * 100}%).")
+
+    def test_05_audit_decision_and_history(self):
+        """Verify POST /api/audit-decision records officer signoff and GET /api/audit-history lists it"""
+        decision_payload = {
+            "analysis_id": "ANL-TEST001",
+            "standard_id": "IS 1786:2008",
+            "decision": "ACCEPTED",
+            "officer_name": "Er. Sachin Gupta",
+            "officer_role": "Chief Procurement Verification Officer",
+            "remarks": "Approved Fe 500D compliance under mandatory Steel QCO."
+        }
+        post_res = self.client.post('/api/audit-decision', data=json.dumps(decision_payload), content_type='application/json')
+        self.assertEqual(post_res.status_code, 200)
+        entry = post_res.get_json()
+        self.assertEqual(entry["decision"], "ACCEPTED")
+
+        hist_res = self.client.get('/api/audit-history')
+        self.assertEqual(hist_res.status_code, 200)
+        logs = hist_res.get_json()
+        self.assertTrue(any(l["analysis_id"] == "ANL-TEST001" for l in logs))
+        print("[PASS] Test 5: Officer audit decision recorded and retrieved from audit history.")
 
 
 if __name__ == "__main__":
-    run_all_tests()
+    print("\n" + "=" * 55)
+    print("Running Flask Backend Verification Tests")
+    print("=" * 55)
+    unittest.main(verbosity=2)

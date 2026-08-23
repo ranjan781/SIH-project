@@ -1,15 +1,30 @@
-# REST API Documentation
+# REST API Documentation (Flask Backend)
 
 **Application:** IS Standard Advisor API  
-**Base URL:** `http://localhost:8000/api`  
-**Swagger UI:** `http://localhost:8000/docs`  
-**ReDoc:** `http://localhost:8000/redoc`
+**Framework:** Python Flask 3.x + Flask-CORS + Werkzeug  
+**Base URL:** `http://localhost:5000/api`
 
 ---
 
 ## Endpoints Overview
 
-### 1. `POST /api/analyze-text`
+### 1. `GET /api/health`
+Health verification endpoint.
+
+**Response (200 OK):**
+```json
+{
+  "backend": "Flask",
+  "framework": "Flask 3.x",
+  "project": "SIH26108",
+  "status": "online",
+  "version": "1.0.0"
+}
+```
+
+---
+
+### 2. `POST /api/analyze-text`
 Analyze pasted raw technical tender text or clause paragraphs.
 
 **Request Payload:**
@@ -69,8 +84,8 @@ Analyze pasted raw technical tender text or clause paragraphs.
 
 ---
 
-### 2. `POST /api/analyze-document`
-Multipart form upload of `.pdf`, `.docx`, or `.txt` tender documents.
+### 3. `POST /api/analyze-document`
+Multipart form upload of `.pdf`, `.docx`, or `.txt` tender documents using Flask `request.files` and Werkzeug `secure_filename`.
 
 **Form Parameters:**
 - `file`: Binary file upload
@@ -80,7 +95,7 @@ Multipart form upload of `.pdf`, `.docx`, or `.txt` tender documents.
 
 ---
 
-### 3. `GET /api/standards`
+### 4. `GET /api/standards`
 Retrieve, search, and filter Indian Standards from the research dataset.
 
 **Query Parameters:**
@@ -90,12 +105,12 @@ Retrieve, search, and filter Indian Standards from the research dataset.
 
 ---
 
-### 4. `GET /api/sample-tenders`
-Returns pre-packaged realistic procurement tender scenarios covering steel, cement, PPE, cables, fire extinguishers, and pipes.
+### 5. `GET /api/sample-tenders`
+Returns pre-packaged realistic procurement tender scenarios.
 
 ---
 
-### 5. `POST /api/audit-decision`
+### 6. `POST /api/audit-decision`
 Record human-in-the-loop verification decisions by authorized procurement officers.
 
 **Request Payload:**
@@ -112,5 +127,5 @@ Record human-in-the-loop verification decisions by authorized procurement office
 
 ---
 
-### 6. `GET /api/audit-history`
+### 7. `GET /api/audit-history` / `GET /api/analysis-history`
 Retrieve complete chronological audit log of all officer signoffs.

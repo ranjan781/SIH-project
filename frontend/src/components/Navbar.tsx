@@ -4,8 +4,7 @@ import {
   Bell, 
   User, 
   Sun, 
-  Moon,
-  Sparkles
+  Moon
 } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
@@ -84,12 +83,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Right: Engine Status, Bright/Dark Mode Toggle, Notifications & Profile */}
+          {/* Right: Flask API Engine Status, Bright/Dark Mode Toggle, Notifications & Profile */}
           <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
-            {/* AI Engine Status Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-emerald-400 text-[11px] font-medium font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>AI Engine Online</span>
+            {/* Flask API Engine Status Pill */}
+            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium font-mono border ${
+              isBackendConnected
+                ? 'bg-emerald-950/60 border-emerald-700/60 text-emerald-400'
+                : 'bg-slate-800/80 border-slate-700 text-slate-400'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+              }`}></span>
+              <span>{isBackendConnected ? 'Flask API Service Live' : 'Flask API Offline'}</span>
             </div>
 
             {/* Bright / Dark Mode Toggle Switch (Sun - Toggle - Moon) */}

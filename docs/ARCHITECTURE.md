@@ -21,17 +21,18 @@ graph TD
         UI7[Officer Signoff & Audit Log]
     end
 
-    subgraph ServiceLayer [FastAPI REST Backend - Python 3.13]
+    subgraph ServiceLayer [Flask REST Backend - Python 3.x]
         API1[POST /api/analyze-text]
         API2[POST /api/analyze-document]
         API3[GET /api/standards]
         API4[GET /api/sample-tenders]
         API5[POST /api/audit-decision]
         API6[GET /api/stats]
+        API7[GET /api/health]
     end
 
     subgraph CoreAIEngine [AI / ML & Regulatory Intelligence]
-        DP[Document Parser & Ingestion: PyPDF / python-docx]
+        DP[Document Parser & Ingestion: PyPDF / python-docx / Werkzeug]
         NER[NLP Entity & Specification Extractor]
         RG[Standards Revision Timeline & Knowledge Graph]
         VEC[TF-IDF & Semantic Vector Engine]
@@ -67,29 +68,14 @@ graph TD
 
 ---
 
-## 2. Component Specifications
+## 2. Backend Component Specifications
 
-### 2.1 Frontend Component Hierarchy
-- **`src/App.tsx`**: Central application state orchestrator managing tabs, current analysis results, officer modals, and backend connectivity status.
-- **`src/components/Navbar.tsx`**: Enterprise government navbar with SIH26108 problem statement branding, live FastAPI health indicator, and tab navigation.
-- **`src/components/DisclaimerBanner.tsx`**: Statutory disclaimer clarifying the Demo Research Dataset boundary.
-- **`src/components/DashboardView.tsx`**: Executive overview with metrics cards, status distribution graphs, risk assessment pillars, and 1-click sample loaders.
-- **`src/components/TenderAnalysisView.tsx`**: Dual-mode input studio (PDF/DOCX upload & clause text paste) with 5-stage progressive pipeline animation.
-- **`src/components/RecommendationResultView.tsx`**: Detailed recommendation results with extracted parameters, cited vs active IS comparison, 5-point XAI rationale, and QCO status.
-- **`src/components/StandardsExplorerView.tsx`**: Interactive searchable and filterable database with full standard detail drawer.
-- **`src/components/DocumentComparisonView.tsx`**: Side-by-side clause diff viewer with parameter-by-parameter alignment table.
-- **`src/components/PipelineMethodologyView.tsx`**: Interactive step-by-step visual architecture walkthrough.
-- **`src/components/ResearchPaperView.tsx`**: 10-section technical paper presentation.
-- **`src/components/AuditHistoryView.tsx`**: Officer decision history with real-time search and CSV log export.
-- **`src/components/VerificationModal.tsx`**: Officer signoff modal with celebratory confetti on approval.
-- **`src/components/ReportModal.tsx`**: Printable official Compliance Verification Certificate.
-
-### 2.2 Backend Modular Architecture
-- **`backend/main.py`**: FastAPI entrypoint with CORS, health routes, and routing.
-- **`backend/models/schemas.py`**: Pydantic data models for strict payload validation.
-- **`backend/services/doc_parser.py`**: Robust PDF, DOCX, and TXT parser with fallback ASCII decoders.
-- **`backend/services/entity_extractor.py`**: NLP and regex entity extractor for IS codes, materials, grades, dimensions, and tests.
-- **`backend/services/standards_service.py`**: Standards catalog querying and filtering service.
-- **`backend/services/recommender.py`**: Recommendation ranking engine combining revision graphs and semantic similarity.
-- **`backend/services/explainability.py`**: Explainable AI and officer audit trail persistence service.
-- **`backend/api/routes.py`**: Clean REST API route handlers.
+### 2.1 Flask Modular Structure
+- **`backend/app.py`**: Flask application entrypoint with Flask-CORS middleware, error handlers, and `/api/health`.
+- **`backend/routes/analysis.py`**: Blueprint handling text and document analysis (`POST /api/analyze-text`, `POST /api/analyze-document`).
+- **`backend/routes/standards.py`**: Blueprint handling standard queries, search, and dashboard statistics (`GET /api/standards`, `GET /api/stats`).
+- **`backend/routes/audit.py`**: Blueprint handling officer signoffs and audit ledger (`POST /api/audit-decision`, `GET /api/audit-history`).
+- **`backend/services/document_parser.py`**: Document parsing for PDF, DOCX, and TXT with `werkzeug.utils.secure_filename`.
+- **`backend/services/standard_matcher.py`**: NLP and regex entity extractor for IS codes, materials, grades, dimensions, and tests.
+- **`backend/services/revision_checker.py`**: Standards dataset catalog and revision timeline graph manager.
+- **`backend/services/recommendation_engine.py`**: AI recommendation engine, compatibility matrix, and explainability synthesizer.

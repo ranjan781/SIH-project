@@ -3,7 +3,7 @@
 **Smart India Hackathon (SIH)** • **Problem Statement ID: SIH26108** • **Branch: `done-by-sachin`**
 
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-blue.svg)](https://reactjs.org/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20Python%203.13-emerald.svg)](https://fastapi.tiangolo.com/)
+[![Flask](https://img.shields.io/badge/Backend-Python%20Flask%203.x-emerald.svg)](https://flask.palletsprojects.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-38bdf8.svg)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 [![SIH](https://img.shields.io/badge/SIH-SIH26108-orange.svg)](https://www.sih.gov.in/)
@@ -28,9 +28,9 @@ In public procurement (GeM, CPWD, PSUs, State PWDs, Defense), technical tender s
 ## 🚀 Core Features
 
 1. **📊 Executive Dashboard:**
-   - Real-time compliance metrics, standards status distribution, risk distribution charts, and 1-click test scenarios.
+   - Real-time compliance metrics, standards status distribution, risk distribution charts, monthly analysis trend, and 1-click test scenarios.
 2. **🔍 Dual-Mode Tender Analysis Studio:**
-   - Upload official procurement documents (`PDF`, `DOCX`, `TXT`) or paste specification clauses with automatic NLP entity extraction.
+   - Upload official procurement documents (`PDF`, `DOCX`, `TXT` using Flask & Werkzeug) or paste specification clauses with automatic NLP entity extraction.
 3. **⚡ Progressive 5-Stage AI Pipeline:**
    - Real-time visualization of text cleaning, NER extraction, revision graph checks, semantic similarity, and XAI rationale generation.
 4. **💡 Explainable AI (XAI) & 5-Point Rationale:**
@@ -43,8 +43,8 @@ In public procurement (GeM, CPWD, PSUs, State PWDs, Defense), technical tender s
    - Formal officer decision signoff (Accept / Flag / Reject) with celebratory feedback and exportable compliance logs (CSV).
 8. **📄 Official Printable Compliance Certificate:**
    - Government-grade verification certificate exportable as PDF/Print.
-9. **📖 SIH Academic Research Dashboard:**
-   - Complete 10-section technical paper presentation embedded directly into the UI.
+9. **🌓 Bright / Dark Mode Toggle:**
+   - 1-Click interactive theme switcher with persistent local storage support.
 
 ---
 
@@ -56,6 +56,7 @@ In public procurement (GeM, CPWD, PSUs, State PWDs, Defense), technical tender s
                                         │
                                         ▼
                          [ Document Ingestion & Parser ]
+                         (Flask request.files & Werkzeug)
                                         │
                                         ▼
                      [ NLP Named Entity Recognition (NER) ]
@@ -91,43 +92,31 @@ In public procurement (GeM, CPWD, PSUs, State PWDs, Defense), technical tender s
 
 ---
 
-## 🧮 Mathematical Formulation
-
-The composite confidence score $C(S, T)$ for candidate standard $S$ given tender text $T$ is computed as:
-
-$$C(S, T) = w_e \cdot S_{\text{entity}} + w_r \cdot S_{\text{revision}} + w_s \cdot S_{\text{spec}} + w_v \cdot S_{\text{semantic}}$$
-
-Where:
-- $w_e = 0.35$ (Direct IS reference or direct replacement match)
-- $w_r = 0.25$ (Active revision status weight: $1.0$ for Current, $0.4$ for Superseded)
-- $w_s = 0.25$ (Technical specification, material grade, and testing compatibility)
-- $w_v = 0.15$ (Semantic cosine similarity over scope and keywords)
-
----
-
 ## 📁 Repository Structure
 
 ```
 SIH-project/
-├── backend/                        # Python FastAPI Backend
-│   ├── api/
-│   │   └── routes.py               # REST API route handlers
-│   ├── models/
-│   │   └── schemas.py              # Pydantic data schemas
+├── backend/                            # Python Flask Backend
+│   ├── app.py                          # Flask application entry point & CORS
+│   ├── routes/
+│   │   ├── analysis.py                 # Document & text analysis routes
+│   │   ├── standards.py                # Standards search & stats routes
+│   │   └── audit.py                    # Officer audit decision routes
 │   ├── services/
-│   │   ├── doc_parser.py           # Multi-format document parser
-│   │   ├── entity_extractor.py     # NLP & regex specification extractor
-│   │   ├── standards_service.py    # Standards dataset catalog manager
-│   │   ├── recommender.py          # AI recommendation & scoring engine
-│   │   └── explainability.py       # XAI & officer audit logging service
+│   │   ├── document_parser.py          # Multi-format document parser
+│   │   ├── standard_matcher.py         # NLP & regex specification extractor
+│   │   ├── revision_checker.py         # Standards dataset catalog manager
+│   │   └── recommendation_engine.py    # AI recommendation & scoring engine
+│   ├── data/
+│   │   ├── standards.json              # Curated Indian Standards dataset
+│   │   └── tenders.json                # Realistic procurement test cases
 │   ├── tests/
-│   │   ├── test_engine.py          # Unit tests
-│   │   └── run_tests.py            # Self-contained test runner
-│   ├── requirements.txt            # Python dependencies
-│   └── main.py                     # FastAPI application entry point
-├── frontend/                       # React 18 + TypeScript + Tailwind Frontend
+│   │   └── run_tests.py                # Flask test runner
+│   ├── uploads/                        # Temporary uploaded document store
+│   └── requirements.txt                # Python Flask dependencies
+├── frontend/                           # React 18 + TypeScript + Tailwind Frontend
 │   ├── src/
-│   │   ├── components/             # UI Components
+│   │   ├── components/                 # UI Components
 │   │   │   ├── Navbar.tsx
 │   │   │   ├── DisclaimerBanner.tsx
 │   │   │   ├── DashboardView.tsx
@@ -141,25 +130,26 @@ SIH-project/
 │   │   │   ├── VerificationModal.tsx
 │   │   │   └── ReportModal.tsx
 │   │   ├── data/
-│   │   │   └── mockData.ts         # Embedded dataset for offline demo reliability
+│   │   │   └── mockData.ts             # Embedded dataset for offline resilience
 │   │   ├── services/
-│   │   │   └── api.ts              # API client with automatic client-side fallback
+│   │   │   └── api.ts                  # Flask API client with automatic fallback
 │   │   ├── types/
-│   │   │   └── index.ts            # TypeScript interfaces
-│   │   ├── App.tsx                 # Main application orchestrator
+│   │   │   └── index.ts                # TypeScript interfaces
+│   │   ├── App.tsx                     # Main application orchestrator
 │   │   └── main.tsx
 │   ├── package.json
 │   ├── tailwind.config.js
 │   └── vite.config.ts
 ├── data/
-│   ├── indian_standards_dataset.json # Curated Indian Standards corpus (28+ records)
-│   └── sample_tenders.json          # Realistic procurement test cases
+│   ├── indian_standards_dataset.json   # Curated Indian Standards corpus
+│   └── sample_tenders.json              # Realistic procurement test cases
 ├── research/
-│   └── RESEARCH_PAPER_SIH26108.md   # Comprehensive academic research treatise
+│   └── RESEARCH_PAPER_SIH26108.md       # Comprehensive academic research treatise
 ├── docs/
-│   ├── ARCHITECTURE.md             # Technical architecture document
-│   ├── API_DOCUMENTATION.md        # REST API endpoint specifications
-│   └── DEMO_WALKTHROUGH.md         # Judging script & presentation guide
+│   ├── ARCHITECTURE.md                 # Technical architecture document
+│   ├── API_DOCUMENTATION.md            # REST API endpoint specifications
+│   └── DEMO_WALKTHROUGH.md             # Judging script & presentation guide
+├── app.py                              # Root Flask runner (python app.py)
 └── README.md
 ```
 
@@ -178,23 +168,21 @@ cd SIH-project
 git checkout done-by-sachin
 ```
 
-### 2. Launch the Frontend
+### 2. Launch the Flask Backend
+```bash
+# In project root
+python -m pip install -r backend/requirements.txt
+python app.py
+```
+*The Flask backend will run at `http://localhost:5000`.*
+
+### 3. Launch the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*The frontend will start instantly at `http://localhost:5173`.*
-
-> **Offline-Ready:** The frontend includes an embedded client-side AI recommendation engine. It operates completely self-contained even if the backend is not started!
-
-### 3. Launch the Backend (Optional for REST API)
-```bash
-# In project root
-python -m pip install -r backend/requirements.txt
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
-```
-*API documentation available at `http://localhost:8000/docs`.*
+*The frontend will start at `http://localhost:5173`.*
 
 ### 4. Run Backend Verification Tests
 ```bash
