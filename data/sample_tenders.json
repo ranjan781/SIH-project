@@ -1,0 +1,93 @@
+[
+  {
+    "id": "TENDER-TOYS-001",
+    "title": "Procurement of Children Playground Activity Swings & Slides for Municipal Parks",
+    "category": "Toys & Child Safety",
+    "issuing_authority": "Directorate of Urban Development & Parks, New Delhi",
+    "tender_ref": "DUD/PARKS/2024/SW-092",
+    "text": "Sealed tenders are invited for the supply and installation of outdoor children playground equipment including double-seat swings, spiral slides, and composite activity structures. All equipment must conform to IS 9873(P-4):2017 with sturdy steel framework, non-toxic lead-free paint finish, head entrapment safety clearance, and maximum user weight capacity of 50 kg per swing position. Manufacturer must submit BIS test certificates for mechanical and flammability parameters.",
+    "expected_detected_product": "Children Swings and Activity Slides",
+    "expected_detected_is": "IS 9873 (Part 4): 2017",
+    "expected_recommended_is": "IS 9873 (Part 4): 2019",
+    "scenario_type": "Outdated Revision Reference",
+    "issue_summary": "The tender cites IS 9873(P-4):2017, but BIS superseded this edition with IS 9873(Part 4):2019 which contains critical updated entrapment probe dimensions and dynamic suspension safety requirements under the mandatory Toys QCO 2020."
+  },
+  {
+    "id": "TENDER-STEEL-002",
+    "title": "Supply of High-Strength TMT Reinforcement Steel Bars for Flyover Construction",
+    "category": "Construction & Structural",
+    "issuing_authority": "State Public Works Department (PWD Bridges Division)",
+    "tender_ref": "PWD/BR/2024/TMT-410",
+    "text": "Bids are invited for procurement of 2500 Metric Tonnes of Thermo-Mechanically Treated (TMT) deformed carbon steel rebar bars of nominal sizes 12mm, 16mm, 20mm, 25mm and 32mm. Steel must conform to Fe 500D grade as per IS 1786:2008 with minimum 0.2% proof stress / yield stress of 500 N/mm2, minimum tensile strength of 565 N/mm2, minimum elongation of 16.0%, and maximum Carbon equivalent of 0.42%. Chemical composition must adhere strictly to Sulphur + Phosphorus max 0.075%.",
+    "expected_detected_product": "TMT Rebars (Fe 500D)",
+    "expected_detected_is": "IS 1786:2008",
+    "expected_recommended_is": "IS 1786:2008",
+    "scenario_type": "Valid & Current Reference",
+    "issue_summary": "Tender specification correctly identifies IS 1786:2008 Grade Fe 500D and specifies matching chemical (S+P <= 0.075%) and mechanical (16% elongation) parameters."
+  },
+  {
+    "id": "TENDER-CEMENT-003",
+    "title": "Bulk Procurement of 43 Grade Ordinary Portland Cement for Irrigation Canal Lining",
+    "category": "Construction & Structural",
+    "issuing_authority": "Water Resources Development Organization",
+    "tender_ref": "WRD/IRR/2024/CEM-112",
+    "text": "Quotations are invited from registered primary cement manufacturers for supply of 15,000 bags of Ordinary Portland Cement (OPC 43 Grade) conforming to IS 8112:1989. The cement must exhibit 28 days minimum compressive strength of 43.0 MPa, initial setting time not less than 30 minutes, final setting time not more than 600 minutes, and specific surface area (Blaine) not less than 225 m2/kg.",
+    "expected_detected_product": "Ordinary Portland Cement (43 Grade)",
+    "expected_detected_is": "IS 8112:1989",
+    "expected_recommended_is": "IS 8112:2013",
+    "scenario_type": "Outdated Revision Reference",
+    "issue_summary": "Tender cites the superseded IS 8112:1989. The active standard is IS 8112:2013 (Second Revision) which introduced stricter limits for chloride content and revised testing tolerances."
+  },
+  {
+    "id": "TENDER-PPE-004",
+    "title": "Supply of Personal Protective Equipment - Industrial Safety Helmets & Steel-Toe Boots",
+    "category": "Safety & PPE",
+    "issuing_authority": "Heavy Engineering PSU Safety Department",
+    "tender_ref": "HEPSU/SAFETY/2024/HL-08",
+    "text": "Offers are invited for supply of 1200 units of High Density Polyethylene (HDPE) Industrial Safety Helmets equipped with 6-point textile suspension, adjustable ratchet nape strap, sweat band, and electrical resistance up to 1.2 kV as per IS 2925:1984. Maximum transmitted impact force shall not exceed 5.0 kN during drop test. Additionally, helmets must be flame retardant.",
+    "expected_detected_product": "Industrial Safety Helmets (HDPE)",
+    "expected_detected_is": "IS 2925:1984",
+    "expected_recommended_is": "IS 2925:1984",
+    "scenario_type": "Valid Standard with Multi-parameter Matching",
+    "issue_summary": "Standard IS 2925:1984 (with latest amendments) is currently active and fully covers the requested shock absorption (5.0 kN) and electrical resistance (1.2 kV) specifications."
+  },
+  {
+    "id": "TENDER-CABLE-005",
+    "title": "Procurement of 1.1 kV Single-Core Flexible Copper Building Wires for Hospital Complex",
+    "category": "Electrical & Cables",
+    "issuing_authority": "Central Public Works Department (Electrical Division)",
+    "tender_ref": "CPWD/ELECT/2024/CAB-501",
+    "text": "Item rate tenders are invited for supply of 1.1 kV Grade single-core multi-strand bright annealed electrolytic copper conductor PVC insulated unsheathed industrial cables (FRLS - Flame Retardant Low Smoke) conforming to IS 694:1990 in sizes 1.5 sq mm, 2.5 sq mm, 4.0 sq mm and 6.0 sq mm. Conductor resistance must conform to Class 5 of IS 8130.",
+    "expected_detected_product": "PVC Insulated Copper House Wires (FRLS)",
+    "expected_detected_is": "IS 694:1990",
+    "expected_recommended_is": "IS 694:2010",
+    "scenario_type": "Outdated Revision Reference with Spec Advancement",
+    "issue_summary": "Tender cites IS 694:1990 while specifying FRLS insulation. IS 694:2010 (Fourth Revision) is the applicable standard that formally incorporated modern halogen emission and smoke density requirements for Flame Retardant Low Smoke (FRLS) compounds."
+  },
+  {
+    "id": "TENDER-FIRE-006",
+    "title": "Supply of Portable Stored Pressure ABC Dry Chemical Powder Fire Extinguishers (6 Kg)",
+    "category": "Fire Safety",
+    "issuing_authority": "State Disaster Management & Fire Services",
+    "tender_ref": "FIRE/SDMA/2024/EXT-303",
+    "text": "Supply of 800 numbers of 6 kg capacity Stored Pressure ABC Dry Powder Fire Extinguishers conforming to IS 2171:1999 for Class A, Class B and Class C fires. The dry chemical powder must contain minimum 50% Mono Ammonium Phosphate with working pressure of 15 bar, minimum discharge time of 15 seconds, and hydrostatic test pressure of 30 bar. Extinguisher must carry valid BIS ISI Mark.",
+    "expected_detected_product": "Portable ABC Dry Powder Fire Extinguisher",
+    "expected_detected_is": "IS 2171:1999",
+    "expected_recommended_is": "IS 15683:2018",
+    "scenario_type": "Withdrawn Standard Replaced by Harmonized Code",
+    "issue_summary": "IS 2171:1999 has been officially WITHDRAWN and superseded by the unified portable fire extinguisher standard IS 15683:2018. Procuring under the withdrawn standard creates severe regulatory non-compliance."
+  },
+  {
+    "id": "TENDER-PIPE-007",
+    "title": "Procurement of HDPE PE-100 Grade Potable Water Distribution Pipes under Jal Jeevan Mission",
+    "category": "Pipes & Infrastructure",
+    "issuing_authority": "Public Health Engineering Department (PHED)",
+    "tender_ref": "PHED/JJM/2024/HDPE-88",
+    "text": "Tenders are invited for supply of High Density Polyethylene (HDPE) pipes of PE 100 grade, pressure class PN 10 (1.0 MPa rating), nominal outer diameter 63mm to 200mm conforming to IS 4984:1995. Carbon black content should be between 2.0% to 2.5% with uniform dispersion. Minimum required hydrostatic strength at 20 deg C for 100 hours is 12.4 MPa.",
+    "expected_detected_product": "HDPE Potable Water Pipes (PE 100, PN 10)",
+    "expected_detected_is": "IS 4984:1995",
+    "expected_recommended_is": "IS 4984:2016",
+    "scenario_type": "Outdated Revision with Polymer Grade Inconsistency",
+    "issue_summary": "The tender mentions PE 100 polymer grade but references IS 4984:1995 (Fourth Revision). PE 100 material requirements and updated hydrostatic burst thresholds were standardized in IS 4984:2016 (Fifth Revision)."
+  }
+]
