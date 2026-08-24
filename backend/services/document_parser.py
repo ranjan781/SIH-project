@@ -4,14 +4,11 @@ import io
 from typing import Tuple
 from werkzeug.utils import secure_filename
 
-# Optional PDF / DOCX parsers with graceful fallbacks
+# PDF parser using pdfplumber (installed via requirements.txt)
 try:
-    from pypdf import PdfReader
+    import pdfplumber
 except ImportError:
-    try:
-        from PyPDF2 import PdfReader
-    except ImportError:
-        PdfReader = None
+    pdfplumber = None
 
 try:
     import docx
@@ -39,16 +36,16 @@ class DocumentParserService:
 
     @classmethod
     def parse_pdf(cls, file_stream: bytes) -> str:
-        if PdfReader is None:
-            raise RuntimeError("PDF parsing library (pypdf) is not installed.")
+        if pdfplumber is None:
+            raise RuntimeError("PDF parsing library (pdfplumber) is not installed. Run: pip install pdfplumber")
         try:
-            reader = PdfReader(io.BytesIO(file_stream))
-            extracted_pages = []
-            for i, page in enumerate(reader.pages):
-                page_text = page.extract_text()
-                if page_text:
-                    extracted_pages.append(page_text)
-            return cls.clean_text("\n\n".join(extracted_pages))
+            with pdfplumber.open(io.BytesIO(file_stream)) as pdf:
+                extracted_pages = []
+                for page in pdf.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        extracted_pages.append(page_text)
+                return cls.clean_text("\n\n".join(extracted_pages))
         except Exception as e:
             raise ValueError(f"Failed to parse PDF document: {str(e)}")
 

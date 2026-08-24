@@ -12,17 +12,83 @@ class StandardMatcherService:
     )
 
     PRODUCT_KEYWORDS = {
-        "Toys & Child Safety": ["swing", "swings", "slides", "slide", "activity toy", "toy", "toys", "playground equipment", "play equipment"],
-        "Construction & Structural": ["tmt", "rebar", "steel bar", "rebars", "concrete", "cement", "opc", "structural steel", "fe 500d", "fe 415", "i-beam", "angle", "channel"],
-        "Safety & PPE": ["safety helmet", "hard hat", "respirator", "n95", "ffp2", "ffp1", "safety shoes", "safety boots", "steel toe"],
-        "Electrical & Cables": ["pvc wire", "cable", "cables", "house wire", "xlpe", "power cable", "copper conductor", "aluminium conductor", "1100v", "11kv", "33kv"],
-        "Fire Safety": ["fire extinguisher", "extinguishers", "dry chemical powder", "abc dry powder", "co2 extinguisher", "firefighting"],
-        "Pipes & Infrastructure": ["hdpe pipe", "pe 100", "pe 80", "gi pipe", "steel tube", "galvanized pipe", "water supply pipe", "potable water"],
-        "Renewable Energy & Solar": ["solar panel", "pv module", "photovoltaic", "solar cell", "solar power"],
-        "Electrical & Lighting": ["led bulb", "led lamp", "led light", "lighting", "self-ballasted"],
-        "Medical & Healthcare": ["surgical mask", "medical mask", "3 ply mask", "surgical gloves", "latex gloves", "sterile gloves"],
-        "Electrical & Infrastructure": ["earthing", "earth pit", "grounding", "earthing electrode", "chemical earthing"]
+        # Matches CSV category: "Cement & Concrete"
+        "Cement & Concrete": [
+            "cement", "opc", "ordinary portland cement", "portland pozzolana cement",
+            "ppc", "concrete", "rcc", "reinforced concrete", "mortar", "slag cement",
+            "fly ash cement", "low heat cement", "sulphate resisting cement",
+            "rapid hardening cement", "white cement", "composite cement", "hydraulic cement"
+        ],
+        # Matches CSV category: "Steel & Metal Products"
+        "Steel & Metal Products": [
+            "tmt", "rebar", "rebars", "steel bar", "steel bars", "structural steel",
+            "fe 500d", "fe 415", "fe 500", "fe 550", "i-beam", "angle", "channel",
+            "steel plate", "steel section", "hollow section", "steel tube", "steel pipe",
+            "stainless steel", "aluminium", "gray iron", "cast iron", "rivet bar",
+            "chequered plate", "mild steel", "high tensile steel"
+        ],
+        # Matches CSV category: "Water Supply & Pipes"
+        "Water Supply & Pipes": [
+            "gi pipe", "galvanized pipe", "water pipe", "water supply pipe",
+            "precast concrete pipe", "ductile iron pipe", "cast iron pipe",
+            "steel pipe water", "sluice valve", "butterfly valve", "pipe fitting",
+            "malleable cast iron fitting", "water distribution"
+        ],
+        # Matches CSV category: "Electrical & Wiring"
+        "Electrical & Wiring": [
+            "pvc wire", "cable", "cables", "house wire", "xlpe", "power cable",
+            "copper conductor", "aluminium conductor", "1100v", "11kv", "33kv",
+            "earthing", "earth pit", "grounding", "mcb", "miniature circuit breaker",
+            "electrical switch", "wiring installation", "electrical wiring"
+        ],
+        # Matches CSV category: "Safety Equipment"
+        "Safety Equipment": [
+            "safety helmet", "hard hat", "industrial helmet", "fire extinguisher",
+            "extinguishers", "dry chemical powder", "abc dry powder", "co2 extinguisher",
+            "firefighting", "safety footwear", "safety shoes", "safety boots",
+            "eye protector", "rubber gloves electrical", "ppe", "protective equipment"
+        ],
+        # Matches CSV category: "Plastic Products"
+        "Plastic Products": [
+            "hdpe pipe", "pe 100", "pe 80", "pe 63", "upvc pipe", "pvc pipe",
+            "polyethylene pipe", "polypropylene", "pet container", "plastic pipe",
+            "plastic product", "food contact plastic", "packaged water bottle"
+        ],
+        # Matches CSV category: "Bricks & Clay Products"
+        "Bricks & Clay Products": [
+            "brick", "bricks", "clay brick", "building brick", "hollow brick",
+            "fly ash brick", "concrete block", "masonry block", "lightweight block",
+            "perforated brick", "lime block", "burnt clay"
+        ],
+        # Matches CSV category: "Timber & Wood Products"
+        "Timber & Wood Products": [
+            "timber", "wood", "plywood", "block board", "particle board",
+            "flush door", "wooden door", "structural timber", "veneered board",
+            "marine plywood", "shuttering plywood", "wood preservation"
+        ],
+        # Matches CSV category: "Paints & Coatings"
+        "Paints & Coatings": [
+            "paint", "enamel paint", "emulsion paint", "primer", "priming paint",
+            "distemper", "varnish", "bituminous paint", "red oxide primer",
+            "exterior enamel", "interior enamel", "coating"
+        ],
+        # Matches CSV category: "Aggregates & Sand"
+        "Aggregates & Sand": [
+            "aggregate", "coarse aggregate", "fine aggregate", "sand", "crushed stone",
+            "gravel", "masonry mortar sand", "plaster sand", "sieve analysis"
+        ],
+        # Matches CSV category: "Adhesives"
+        "Adhesives": [
+            "adhesive", "resin adhesive", "wood adhesive", "pvac adhesive",
+            "phenolic adhesive", "synthetic resin", "glue", "bonding"
+        ],
+        # Matches CSV category: "Furniture"
+        "Furniture": [
+            "furniture", "chair", "table", "school furniture", "library furniture",
+            "work chair", "wooden furniture", "office chair", "classroom furniture"
+        ],
     }
+
 
     GRADE_PATTERNS = [
         re.compile(r'\b(Fe\s*500D|Fe\s*500|Fe\s*415D|Fe\s*415|Fe\s*550D|Fe\s*550|Fe\s*600)\b', re.IGNORECASE),
@@ -105,11 +171,31 @@ class StandardMatcherService:
                 detected_category = "General Public Procurement"
 
         # 2. Detect Product Name
+        PRODUCT_DISPLAY_NAMES = {
+            "tmt": "TMT Rebars", "rebar": "Steel Rebar", "rebars": "Steel Rebars",
+            "cement": "OPC Cement", "opc": "OPC Cement", "concrete": "Concrete",
+            "structural steel": "Structural Steel",
+            "swing": "Children Swings", "swings": "Children Swings",
+            "slide": "Activity Slide", "slides": "Activity Slides",
+            "activity toy": "Activity Toys", "toy": "Toys", "toys": "Toys",
+            "playground equipment": "Playground Equipment",
+            "safety helmet": "Industrial Safety Helmet", "hard hat": "Industrial Safety Helmet",
+            "respirator": "Respirator / N95 Mask", "n95": "N95 Respirator",
+            "safety shoes": "Safety Footwear", "safety boots": "Safety Boots",
+            "pvc wire": "PVC Insulated Wire", "cable": "PVC Cable", "cables": "PVC Cables",
+            "house wire": "PVC House Wire", "xlpe": "XLPE Power Cable",
+            "fire extinguisher": "ABC Fire Extinguisher", "extinguishers": "Fire Extinguishers",
+            "hdpe pipe": "HDPE Water Pipe", "gi pipe": "GI Steel Pipe",
+            "solar panel": "Solar PV Module", "pv module": "Solar PV Module",
+            "led bulb": "LED Lamp", "led lamp": "LED Lamp",
+            "surgical mask": "Surgical Face Mask", "surgical gloves": "Surgical Gloves",
+            "earthing": "Earthing System", "earth pit": "Earth Pit Electrode",
+        }
         detected_product = None
         for cat, kws in cls.PRODUCT_KEYWORDS.items():
             for kw in kws:
                 if kw in text_lower:
-                    detected_product = kw.title()
+                    detected_product = PRODUCT_DISPLAY_NAMES.get(kw, kw.title())
                     break
             if detected_product:
                 break

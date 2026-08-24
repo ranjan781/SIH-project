@@ -126,12 +126,17 @@ export interface SampleTender {
   issue_summary: string;
 }
 
+export interface OfficerProfile {
+  name: string;
+  role: string;
+  department: string;
+}
+
 export type ActiveTab = 
   | 'dashboard'
   | 'analyze'
   | 'recommendation'
   | 'standards'
-  | 'comparison'
-  | 'pipeline'
-  | 'research'
-  | 'audit';
+  | 'comparison';
+
+

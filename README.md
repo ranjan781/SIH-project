@@ -1,6 +1,6 @@
 # IS Standard Advisor
 ### AI-Powered Indian Standards Recommendation Engine for Procurement Specifications
-**Smart India Hackathon (SIH)** • **Problem Statement ID: SIH26108** • **Branch: `done-by-sachin`**
+**Smart India Hackathon (SIH)** • **Problem Statement ID: SIH26108** • 
 
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-blue.svg)](https://reactjs.org/)
 [![Flask](https://img.shields.io/badge/Backend-Python%20Flask%203.x-emerald.svg)](https://flask.palletsprojects.com/)
