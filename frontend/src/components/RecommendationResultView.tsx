@@ -8,11 +8,11 @@ import {
   FileText, 
   GitCompare, 
   Printer, 
-  Layers, 
   Info,
   ChevronRight,
   Sparkles,
-  Check
+  Layers,
+  ArrowRight
 } from 'lucide-react';
 import type { DocumentAnalysisResult, ActiveTab } from '../types';
 
@@ -47,59 +47,60 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
 
   const statusConfig = {
     VALID: {
-      bg: 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200',
       badgeBg: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700',
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
-      label: 'Verified • Valid & Current Reference'
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0" />,
+      label: 'Verified • Valid & Current Standard'
     },
     OUTDATED_REFERENCE: {
-      bg: 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-200',
+      bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200',
       badgeBg: 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700',
-      icon: <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
-      label: 'Review Required • Superseded Revision Detected'
+      icon: <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400 shrink-0" />,
+      label: 'Review Required • Superseded Revision Cited'
     },
     REVIEW_REQUIRED: {
-      bg: 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100',
+      bg: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100',
       badgeBg: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700',
-      icon: <Info className="w-4 h-4 text-slate-600 dark:text-slate-400" />,
+      icon: <Info className="w-6 h-6 text-slate-600 dark:text-slate-400 shrink-0" />,
       label: 'Standard Alignment Advisory'
     },
     MISMATCH_DETECTED: {
-      bg: 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200',
+      bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-950 dark:text-rose-200',
       badgeBg: 'bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200 border-rose-300 dark:border-rose-700',
-      icon: <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
-      label: 'Critical • Specification Mismatch'
+      icon: <XCircle className="w-6 h-6 text-rose-600 dark:text-rose-400 shrink-0" />,
+      label: 'Critical • Non-Compliant Specification'
     }
   }[overall_status] || {
-    bg: 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100',
+    bg: 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100',
     badgeBg: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700',
-    icon: <Info className="w-4 h-4 text-slate-600 dark:text-slate-400" />,
+    icon: <Info className="w-6 h-6 text-slate-600 dark:text-slate-400 shrink-0" />,
     label: overall_status
   };
 
   const confidencePct = Math.round(overall_confidence * 100);
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-16 animate-page-enter">
-      {/* Top Compliance Summary Banner */}
-      <div className={`rounded-xl p-5 border shadow-xs ${statusConfig.bg}`}>
+    <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-fadeIn">
+      
+      {/* Executive Status Header */}
+      <div className={`rounded-2xl p-6 border shadow-xs ${statusConfig.bg}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 shrink-0">{statusConfig.icon}</div>
+          <div className="flex items-start gap-4">
+            <div className="mt-1">{statusConfig.icon}</div>
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${statusConfig.badgeBg}`}>
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${statusConfig.badgeBg}`}>
                   {statusConfig.label}
                 </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                  ID: {analysisResult.analysis_id}
+                <span className="text-xs text-slate-500 font-mono">
+                  Analysis ID: {analysisResult.analysis_id}
                 </span>
               </div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {summary_verdict}
-              </h2>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Document: <strong className="text-slate-800 dark:text-slate-200 font-semibold">{document_name}</strong>
+              </h1>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                Document: <strong className="text-slate-900 dark:text-slate-100">{document_name}</strong>
                 {tender_ref && <> • Ref: <span className="font-mono text-slate-700 dark:text-slate-300">{tender_ref}</span></>}
                 {issuing_authority && <> • Authority: <span className="text-slate-700 dark:text-slate-300">{issuing_authority}</span></>}
               </p>
@@ -107,188 +108,82 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+          <div className="flex items-center gap-3 shrink-0 self-end md:self-auto">
             <button
               onClick={onOpenReportModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-xs transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs transition-all"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Export Audit Certificate</span>
+              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              <span>Export Audit Report</span>
             </button>
             <button
               onClick={onOpenDecisionModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-200" />
+              <ShieldCheck className="w-4 h-4 text-blue-200" />
               <span>Officer Signoff</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Specifications & Primary Recommendation */}
+      {/* Main Grid: Recommended Standard & Extracted Specs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column (5 Cols): Extracted Specifications */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5 mb-3.5">
-              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-slate-500" />
-                <span>Extracted Product Specifications</span>
-              </h3>
-              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono px-1.5 py-0.2 rounded font-semibold">
-                NLP Extracted
-              </span>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Identified Product</span>
-                <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{detected_product}</p>
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Product Category</span>
-                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{detected_category}</p>
-              </div>
-
-              {extracted_specifications.grade && (
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Specified Technical Grade</span>
-                  <p className="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 inline-block text-[11px]">
-                    {extracted_specifications.grade}
-                  </p>
-                </div>
-              )}
-
-              {extracted_specifications.material && (
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Material Composition</span>
-                  <p className="font-medium text-slate-700 dark:text-slate-300 mt-0.5">{extracted_specifications.material}</p>
-                </div>
-              )}
-
-              {extracted_specifications.dimensions && (
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Dimensions & Physical Limits</span>
-                  <p className="font-mono text-slate-700 dark:text-slate-300 mt-0.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 text-[11px]">
-                    {extracted_specifications.dimensions}
-                  </p>
-                </div>
-              )}
-
-              {extracted_specifications.testing_requirements.length > 0 && (
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Required Testing Protocols</span>
-                  <ul className="mt-1 space-y-1">
-                    {extracted_specifications.testing_requirements.map((test, i) => (
-                      <li key={i} className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 text-[11px]">
-                        <span className="w-1 h-1 rounded-full bg-slate-400 shrink-0"></span>
-                        <span>{test}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Referenced Standards in Document */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2.5">
-              Referenced IS Codes in Document
-            </h3>
-
-            {referenced_standards.length > 0 ? (
-              <div className="space-y-2">
-                {referenced_standards.map((ref, idx) => {
-                  const isRefOutdated = ref.discrepancy_type === 'OUTDATED_REVISION' || ref.discrepancy_type === 'WITHDRAWN_STANDARD';
-                  return (
-                    <div 
-                      key={idx}
-                      className={`p-3 rounded-lg border text-xs ${
-                        isRefOutdated 
-                          ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200' 
-                          : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-xs">{ref.normalized_is}</span>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${
-                          isRefOutdated ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 border-amber-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-300'
-                        }`}>
-                          {ref.discrepancy_type.replace('_', ' ')}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                        {ref.discrepancy_details}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 text-center">
-                No explicit IS standard number referenced in tender clauses.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column (7 Cols): Primary Standard Recommendation */}
-        <div className="lg:col-span-7 space-y-4">
+        
+        {/* Recommended Standard (7 Cols) */}
+        <div className="lg:col-span-7 space-y-6">
           {primary_recommendation ? (
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 shadow-xs overflow-hidden">
-              {/* Card Header (Deep Navy Header) */}
-              <div className="bg-[#0b1329] text-white p-5 border-b border-slate-800">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+              {/* Header */}
+              <div className="bg-slate-900 text-white p-6 border-b border-slate-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Recommended Indian Standard</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                    <Award className="w-4 h-4" />
+                    <span>Recommended Indian Standard (IS)</span>
                   </span>
-                  <div className="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded text-xs font-mono font-bold text-slate-200 border border-slate-700">
-                    <Sparkles className="w-3 h-3 text-blue-400" />
-                    <span>{confidencePct}% Confidence ({primary_recommendation.confidence_level})</span>
-                  </div>
+                  <span className="px-3 py-1 bg-blue-950 text-blue-300 border border-blue-800 rounded-full text-xs font-mono font-bold">
+                    {confidencePct}% Confidence Match
+                  </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mt-1.5 font-mono">
+                <h2 className="text-2xl font-bold font-mono text-white mt-2">
                   {primary_recommendation.is_number}
-                </h3>
-                <p className="text-xs text-slate-300 font-medium mt-0.5 leading-relaxed">
+                </h2>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   {primary_recommendation.title}
                 </p>
               </div>
 
-              <div className="p-5 space-y-4 text-xs">
+              {/* Body */}
+              <div className="p-6 space-y-5 text-xs">
                 {/* 5-Point Explainable AI Justifications */}
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>Why this standard? (Explainable AI Rationale)</span>
-                  </h4>
-                  <div className="space-y-1.5">
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>Evidence Rationale (Explainable AI)</span>
+                  </h3>
+                  <div className="space-y-2">
                     {primary_recommendation.why_recommended_reasons.map((reason, i) => (
-                      <div key={i} className="flex items-start gap-2 p-2 rounded bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200">
-                        <span className="font-mono text-[10px] font-bold text-slate-500 w-4 shrink-0 mt-0.5">
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-xs font-bold text-blue-600 shrink-0 mt-0.5">
                           0{i + 1}.
                         </span>
-                        <span className="leading-relaxed">{reason}</span>
+                        <span className="leading-relaxed font-medium">{reason}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Flagged / Superseded Rejection Reason */}
+                {/* Superseded Rejection Warning */}
                 {primary_recommendation.why_rejected_reasons.length > 0 && (
-                  <div className="p-3 rounded-lg bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-                    <h4 className="text-[11px] font-bold text-amber-950 dark:text-amber-200 uppercase tracking-wider flex items-center gap-1 mb-1">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Why was the referenced edition flagged?</span>
-                    </h4>
-                    <div className="space-y-1 text-xs text-amber-900 dark:text-amber-300">
+                  <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+                    <h3 className="text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      <span>Why standard cited in tender was flagged</span>
+                    </h3>
+                    <div className="space-y-1.5 text-xs text-amber-800 dark:text-amber-300">
                       {primary_recommendation.why_rejected_reasons.map((rej, i) => (
-                        <p key={i} className="flex items-start gap-1.5">
+                        <p key={i} className="flex items-start gap-2">
                           <span className="text-amber-600 font-bold">•</span>
                           <span>{rej}</span>
                         </p>
@@ -297,13 +192,13 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
                   </div>
                 )}
 
-                {/* Quality Control Order */}
+                {/* Quality Control Order Callout */}
                 {primary_recommendation.mandatory_qco && (
-                  <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs">
-                    <span className="font-bold text-slate-800 dark:text-slate-200 uppercase text-[10px] block mb-0.5">
-                      Statutory Quality Control Order (QCO) Reference
+                  <div className="p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs">
+                    <span className="font-bold text-blue-900 dark:text-blue-200 uppercase text-[10px] tracking-wider block mb-1">
+                      Statutory Quality Control Order (QCO) Mandate
                     </span>
-                    <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
+                    <p className="text-blue-800 dark:text-blue-300 font-semibold leading-relaxed">
                       {primary_recommendation.mandatory_qco}
                     </p>
                   </div>
@@ -315,56 +210,54 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                       Standard Scope Excerpt
                     </span>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-2.5 rounded border border-slate-200 dark:border-slate-700 leading-relaxed italic">
+                    <p className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700 leading-relaxed italic">
                       "{primary_recommendation.scope_excerpt}"
                     </p>
                   </div>
                 )}
 
-                {/* Quick Link to Side-by-Side Comparison */}
-                {diff_comparison && (
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-                    <button
-                      onClick={() => setActiveTab('comparison')}
-                      className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      <GitCompare className="w-3.5 h-3.5" />
-                      <span>View Side-by-Side Clause Diff Matrix</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                {/* Action Row */}
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <button
+                    onClick={() => setActiveTab('comparison')}
+                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5"
+                  >
+                    <GitCompare className="w-4 h-4" />
+                    <span>View Clause-by-Clause Diff Matrix</span>
+                  </button>
 
-                    <button
-                      onClick={onOpenDecisionModal}
-                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Signoff Decision →
-                    </button>
-                  </div>
-                )}
+                  <button
+                    onClick={onOpenDecisionModal}
+                    className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>Record Officer Decision</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-slate-200 dark:border-slate-800 text-center text-slate-500">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 text-center text-slate-500">
               No matching Indian Standard recommendation found.
             </div>
           )}
 
           {/* Supplementary Standards */}
           {alternative_recommendations.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-slate-500" />
-                <span>Supplementary & Test Standards</span>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <Layers className="w-4 h-4 text-slate-500" />
+                <span>Supplementary Standards in Category</span>
               </h3>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {alternative_recommendations.map((alt) => (
-                  <div key={alt.standard_id} className="p-2.5 rounded bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 flex items-center justify-between text-xs">
+                  <div key={alt.standard_id} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{alt.is_number}</span>
-                      <span className="text-slate-500 dark:text-slate-400 ml-2">{alt.title}</span>
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">{alt.is_number}</span>
+                      <span className="text-slate-600 dark:text-slate-400 ml-2">{alt.title}</span>
                     </div>
-                    <span className="font-mono font-semibold text-slate-600 dark:text-slate-300 shrink-0 ml-2">
-                      {Math.round(alt.confidence_score * 100)}%
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-300 shrink-0 ml-3">
+                      {Math.round(alt.confidence_score * 100)}% Match
                     </span>
                   </div>
                 ))}
@@ -372,7 +265,116 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
             </div>
           )}
         </div>
+
+        {/* Extracted Specifications (5 Cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <FileText className="w-4 h-4 text-slate-500" />
+                <span>Extracted Tender Specifications</span>
+              </h3>
+              <span className="text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">
+                NLP Output
+              </span>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Identified Product</span>
+                <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">{detected_product}</p>
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Sector Category</span>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{detected_category}</p>
+              </div>
+
+              {extracted_specifications.grade && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Technical Grade</span>
+                  <p className="font-mono font-bold text-slate-900 dark:text-white mt-1 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs inline-block">
+                    {extracted_specifications.grade}
+                  </p>
+                </div>
+              )}
+
+              {extracted_specifications.material && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Material Specs</span>
+                  <p className="font-medium text-slate-700 dark:text-slate-300 mt-0.5">{extracted_specifications.material}</p>
+                </div>
+              )}
+
+              {extracted_specifications.dimensions && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Dimensions & Physical Limits</span>
+                  <p className="font-mono text-slate-700 dark:text-slate-300 mt-1 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
+                    {extracted_specifications.dimensions}
+                  </p>
+                </div>
+              )}
+
+              {extracted_specifications.testing_requirements.length > 0 && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Required Test Protocols</span>
+                  <ul className="mt-1.5 space-y-1">
+                    {extracted_specifications.testing_requirements.map((test, i) => (
+                      <li key={i} className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                        <span>{test}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Referenced Standards Box */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+            <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              Referenced IS Codes in Document
+            </h3>
+
+            {referenced_standards.length > 0 ? (
+              <div className="space-y-2.5">
+                {referenced_standards.map((ref, idx) => {
+                  const isRefOutdated = ref.discrepancy_type === 'OUTDATED_REVISION' || ref.discrepancy_type === 'WITHDRAWN_STANDARD';
+                  return (
+                    <div 
+                      key={idx}
+                      className={`p-3.5 rounded-xl border text-xs ${
+                        isRefOutdated 
+                          ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200' 
+                          : 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-bold text-xs">{ref.normalized_is}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          isRefOutdated ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 border-amber-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-300'
+                        }`}>
+                          {ref.discrepancy_type.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                        {ref.discrepancy_details}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 text-center">
+                No explicit IS standard number referenced in tender clauses.
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
+
     </div>
   );
 };

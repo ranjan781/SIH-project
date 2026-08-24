@@ -6,9 +6,6 @@ import { TenderAnalysisView } from './components/TenderAnalysisView';
 import { RecommendationResultView } from './components/RecommendationResultView';
 import { StandardsExplorerView } from './components/StandardsExplorerView';
 import { DocumentComparisonView } from './components/DocumentComparisonView';
-import { PipelineMethodologyView } from './components/PipelineMethodologyView';
-import { ResearchPaperView } from './components/ResearchPaperView';
-import { AuditHistoryView } from './components/AuditHistoryView';
 import { VerificationModal } from './components/VerificationModal';
 import { ReportModal } from './components/ReportModal';
 import type { 
@@ -16,7 +13,8 @@ import type {
   DocumentAnalysisResult, 
   StandardRecord, 
   SampleTender, 
-  AuditLogEntry 
+  AuditLogEntry,
+  OfficerProfile
 } from './types';
 import { ApiService } from './services/api';
 import { INITIAL_STANDARDS_DATA, SAMPLE_TENDERS, DEFAULT_AUDIT_LOGS } from './data/mockData';
@@ -26,6 +24,19 @@ export function App() {
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('sih_theme') === 'dark';
+  });
+
+  // Active Verification Officer State (Persisted in localStorage)
+  const [officerProfile, setOfficerProfile] = useState<OfficerProfile>(() => {
+    const saved = localStorage.getItem('sih_officer_profile');
+    if (saved) {
+      try { return JSON.parse(saved); } catch {}
+    }
+    return {
+      name: 'Er. Sachin Gupta',
+      role: 'Chief Procurement Verification Officer',
+      department: 'CPWD Technical Office, New Delhi'
+    };
   });
 
   const [standards, setStandards] = useState<StandardRecord[]>(INITIAL_STANDARDS_DATA);
@@ -38,6 +49,12 @@ export function App() {
 
   const [isDecisionModalOpen, setIsDecisionModalOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+
+  // Update & Persist Officer Profile
+  const handleUpdateOfficerProfile = (profile: OfficerProfile) => {
+    setOfficerProfile(profile);
+    localStorage.setItem('sih_officer_profile', JSON.stringify(profile));
+  };
 
   // Toggle Dark Mode
   useEffect(() => {
@@ -95,8 +112,8 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200">
-      {/* Top Navigation Bar with exact photo layout & Dark/Light Toggle */}
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200">
+      {/* Top Navigation Bar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -104,13 +121,14 @@ export function App() {
         hasActiveResult={!!currentAnalysisResult}
         isDarkMode={isDarkMode}
         toggleDarkMode={toggleDarkMode}
+        officerProfile={officerProfile}
+        onUpdateOfficerProfile={handleUpdateOfficerProfile}
       />
 
-      {/* Demo & Research Notice Banner */}
       <DisclaimerBanner />
 
       {/* Main Page Content */}
-      <main className="flex-1 max-w-[1520px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main className="flex-1 max-w-[1520px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'dashboard' && (
           <DashboardView
             setActiveTab={setActiveTab}
@@ -140,13 +158,13 @@ export function App() {
 
         {activeTab === 'recommendation' && !currentAnalysisResult && (
           <div className="max-w-md mx-auto my-16 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-xs">
-            <h3 className="text-base font-bold text-slate-800 dark:text-white">No Tender Document Analyzed Yet</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">No Tender Document Analyzed Yet</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Select or paste a tender specification to generate Indian Standard recommendations.
             </p>
             <button
               onClick={() => setActiveTab('analyze')}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold"
+              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
             >
               Go to Tender Analysis Studio
             </button>
@@ -164,51 +182,39 @@ export function App() {
             onOpenDecisionModal={() => setIsDecisionModalOpen(true)}
           />
         )}
-
-        {activeTab === 'pipeline' && (
-          <PipelineMethodologyView />
-        )}
-
-        {activeTab === 'research' && (
-          <ResearchPaperView />
-        )}
-
-        {activeTab === 'audit' && (
-          <AuditHistoryView logs={auditLogs} />
-        )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#0b1329] text-slate-400 text-xs py-5 border-t border-slate-800 mt-auto">
+      {/* Clean Enterprise Footer */}
+      <footer className="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
         <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <p className="font-semibold text-slate-200">
-              IS Standard Advisor • Problem Statement: SIH26108
+            <p className="font-bold text-slate-200">
+              IS Standard Advisor • Public Procurement Verification Portal
             </p>
-            <p className="text-[11px] text-slate-400">
-              AI-Powered Indian Standards Recommendation Engine for Public Procurement Specifications
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Bureau of Indian Standards Public Procurement Intelligent Verification System
             </p>
           </div>
-          <div className="flex items-center space-x-4 text-[11px]">
-            <span>Demo Research Prototype</span>
+          <div className="flex items-center space-x-4 text-[11px] font-medium">
+            <span>Logged in as: <strong className="text-slate-200 font-bold">{officerProfile.name}</strong> ({officerProfile.role})</span>
             <span>•</span>
-            <span>Government Enterprise Design</span>
-            <span>•</span>
-            <span className="text-blue-400 font-medium">Smart India Hackathon</span>
+            <span className="text-blue-400 font-bold">Enterprise Procurement Bureau</span>
           </div>
         </div>
       </footer>
 
-      {/* Verification / Officer Signoff Modal */}
+
+      {/* Officer Signoff Modal */}
       {isDecisionModalOpen && currentAnalysisResult && (
         <VerificationModal
           analysisResult={currentAnalysisResult}
           onClose={() => setIsDecisionModalOpen(false)}
           onDecisionRecorded={handleDecisionRecorded}
+          officerProfile={officerProfile}
         />
       )}
 
-      {/* Printable Report Modal */}
+      {/* Audit Report Modal */}
       {isReportModalOpen && currentAnalysisResult && (
         <ReportModal
           analysisResult={currentAnalysisResult}
