@@ -5,3 +5,37 @@ __pycache__/
 node_modules/
 data/embeddings/*.faiss
 .DS_Store
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.npm/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Pytest & Logs
+.pytest_cache/
+.coverage
+*.log
+
+# Backend Uploads (keep directory structure with .gitkeep)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
