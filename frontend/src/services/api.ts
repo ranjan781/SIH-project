@@ -126,6 +126,69 @@ export class ApiService {
     return results;
   }
 
+  // ── Full BIS CSV Dataset (131 standards) ────────────────────────────────
+
+  static async searchCatalog(
+    query: string,
+    category?: string,
+    n: number = 15
+  ): Promise<any[]> {
+    try {
+      const params = new URLSearchParams();
+      if (query) params.append('q', query);
+      if (category && category !== 'all') params.append('category', category);
+      params.append('n', String(n));
+      const res = await fetch(`${API_BASE}/catalog/search?${params.toString()}`);
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("Catalog search failed:", e);
+    }
+    return [];
+  }
+
+  static async lookupStandard(isNumber: string): Promise<any | null> {
+    try {
+      const res = await fetch(`${API_BASE}/catalog/lookup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_number: isNumber })
+      });
+      if (res.ok) return await res.json();
+      if (res.status === 404) {
+        const body = await res.json();
+        return { found: false, message: body.message };
+      }
+    } catch (e) {
+      console.warn("Standard lookup failed:", e);
+    }
+    return null;
+  }
+
+  static async getCatalogStats(): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE}/catalog/stats`);
+      if (res.ok) return await res.json();
+    } catch {}
+    return { total_standards: 0, category_distribution: {} };
+  }
+
+  static async getCatalogCategories(): Promise<string[]> {
+    try {
+      const res = await fetch(`${API_BASE}/catalog/categories`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.categories || [];
+      }
+    } catch {}
+    return [
+      'Cement & Concrete', 'Steel & Metal Products', 'Water Supply & Pipes',
+      'Electrical & Wiring', 'Safety Equipment', 'Plastic Products',
+      'Bricks & Clay Products', 'Timber & Wood Products', 'Paints & Coatings',
+      'Aggregates & Sand', 'Adhesives', 'Furniture'
+    ];
+  }
+
+
   static async getSampleTenders(): Promise<SampleTender[]> {
     const isOnline = await this.checkBackendHealth();
     if (isOnline) {

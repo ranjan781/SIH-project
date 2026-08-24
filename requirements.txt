@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+Flask
+flask-cors
+pydantic
+python-multipart
+
+pandas
+numpy
+
+faiss-cpu
+sentence-transformers
+
+pdfplumber
+
+# Translation
+deep-translator

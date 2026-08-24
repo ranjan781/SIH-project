@@ -10,6 +10,7 @@ from flask_cors import CORS
 from backend.routes.analysis import analysis_bp
 from backend.routes.standards import standards_bp
 from backend.routes.audit import audit_bp
+from backend.routes.catalog import catalog_bp
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -21,6 +22,7 @@ def create_app() -> Flask:
     app.register_blueprint(analysis_bp)
     app.register_blueprint(standards_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(catalog_bp)
 
     @app.route("/api/health", methods=["GET"])
     def health():
@@ -38,6 +40,9 @@ def create_app() -> Flask:
             "message": "IS Standard Advisor - Flask API Backend is running",
             "health": "/api/health",
             "standards": "/api/standards",
+            "catalog": "/api/catalog/search?q=cement",
+            "catalog_stats": "/api/catalog/stats",
+            "catalog_lookup": "/api/catalog/lookup  [POST]",
             "docs": "REST API available at /api/*"
         }), 200
 

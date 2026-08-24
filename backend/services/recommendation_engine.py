@@ -5,6 +5,11 @@ from typing import List, Dict, Any, Optional
 
 from backend.services.revision_checker import RevisionCheckerService
 from backend.services.standard_matcher import StandardMatcherService
+from backend.services.csv_catalog_service import (
+    similarity_search as csv_search,
+    enrich_with_status,
+    get_all_records as csv_all_records,
+)
 
 
 class RecommendationEngineService:
@@ -107,11 +112,126 @@ class RecommendationEngineService:
                 "discrepancy_details": details
             })
 
-        # 3. Retrieve Candidate Standards for Ranking
-        all_standards = self.revision_service.get_all_standards()
-        sim_scores = self.matcher_service.compute_semantic_similarity(tender_text, all_standards)
+        # 3. Retrieve Candidate Standards from FULL CSV Dataset (131 standards)
+        # Use the TF-IDF vector store built from bis_standards_dataset_expanded.csv
+        category_hint_for_csv = detected_category if detected_category and detected_category != "General Public Procurement" else None
+
+        # Primary: semantic search over full CSV dataset
+        csv_hits = csv_search(tender_text, n_results=20, category_filter=category_hint_for_csv)
+        # Also do uncategorized top-10 search to catch cross-category matches
+        csv_hits_uncategorized = csv_search(tender_text, n_results=10, category_filter=None)
+        # Merge, deduplicate
+        seen_is = set()
+        merged_csv = []
+        for h in csv_hits + csv_hits_uncategorized:
+            k = h.get("IS_number", "")
+            if k not in seen_is:
+                seen_is.add(k)
+                merged_csv.append(h)
+
+        # Enrich with Superseded/Withdrawn status from standards.json
+        enriched_csv = enrich_with_status(merged_csv, self.revision_service)
+
+        # Normalize CSV records to the schema expected by scoring engine
+        def _normalize_csv_record(rec: Dict) -> Dict:
+            is_num = rec.get("IS_number", "")
+            # Extract base number and year from IS number string
+            import re as _re
+            m = _re.match(r"(IS[\s\d]+(?:\(Part\s*\d+\))?)\s*[:\-]?\s*(\d{4})?", is_num.strip())
+            base_num = m.group(1).strip() if m else is_num.split(":")[0].strip()
+            year_str = m.group(2) if m and m.group(2) else None
+
+            norm_refs = rec.get("normative_refs", "").replace(";", ",").split(",")
+            norm_refs = [r.strip() for r in norm_refs if r.strip()]
+
+            return {
+                "id": is_num.replace(" ", "-").replace(":", "-").replace("(", "").replace(")", ""),
+                "is_number": is_num,
+                "base_number": base_num,
+                "title": rec.get("title", ""),
+                "category": rec.get("category", ""),
+                "status": rec.get("status", "Current"),
+                "current_edition_year": int(year_str) if year_str else None,
+                "amendments": [rec.get("amendment", "")] if rec.get("amendment") else [],
+                "superseded_by": rec.get("superseded_by"),
+                "replaces": rec.get("replaces"),
+                "scope": rec.get("scope_description", ""),
+                "applicable_products": [],
+                "keywords": [w.lower() for w in rec.get("title", "").split() if len(w) > 3],
+                "technical_parameters": {},
+                "testing_methods": norm_refs,
+                "mandatory_qco": rec.get("mandatory_qco", rec.get("certification_required", "")),
+                "notes": rec.get("certification_required", ""),
+                "_similarity_score": rec.get("similarity_score", 0.0),
+            }
+
+        all_standards_from_csv = [_normalize_csv_record(r) for r in enriched_csv]
+
+        # Fallback: also include standards.json records (for Superseded/Withdrawn resolution)
+        std_json_records = self.revision_service.get_all_standards()
+        std_json_is_nums = {s["is_number"] for s in std_json_records}
+        csv_is_nums = {s["is_number"] for s in all_standards_from_csv}
+        # Add JSON records not already in CSV results
+        for jstd in std_json_records:
+            if jstd["is_number"] not in csv_is_nums:
+                jstd["_similarity_score"] = 0.0
+                all_standards_from_csv.append(jstd)
+
+        all_standards = all_standards_from_csv
+
+        # Build sim_scores from CSV similarity scores + TF-IDF fallback for JSON-only records
+        tfidf_scores_json = self.matcher_service.compute_semantic_similarity(
+            tender_text, [s for s in all_standards if s.get("_similarity_score", 0) == 0]
+        )
+        tfidf_map = {s["is_number"]: score for s, score in tfidf_scores_json}
+
+        sim_scores = []
+        for std in all_standards:
+            csv_score = std.get("_similarity_score", 0.0)
+            tfidf_score = tfidf_map.get(std["is_number"], 0.0)
+            # Use the higher of the two scores
+            sim_scores.append((std, max(csv_score, tfidf_score)))
+
 
         # 4. Multi-Factor Composite Scoring
+        text_lower = tender_text.lower()
+        detected_product = None
+        PRODUCT_DISPLAY_NAMES = {
+            "tmt": "TMT Rebars",
+            "rebar": "Steel Rebars",
+            "rebars": "Steel Rebars",
+            "concrete": "Concrete",
+            "cement": "OPC Cement",
+            "opc": "OPC Cement",
+            "structural steel": "Structural Steel",
+            "swing": "Children Swings",
+            "swings": "Children Swings",
+            "slides": "Activity Slides",
+            "slide": "Activity Slide",
+            "playground equipment": "Playground Equipment",
+            "toy": "Toys",
+            "toys": "Toys",
+            "safety helmet": "Industrial Safety Helmet",
+            "hard hat": "Industrial Safety Helmet",
+            "pvc wire": "PVC Insulated Wire",
+            "cable": "PVC Insulated Cable",
+            "cables": "PVC Insulated Cables",
+            "fire extinguisher": "ABC Fire Extinguisher",
+            "extinguishers": "ABC Fire Extinguishers",
+            "hdpe pipe": "HDPE Potable Water Pipe",
+            "solar panel": "Solar PV Module",
+            "led bulb": "LED Lamp",
+            "surgical mask": "Surgical Face Mask",
+            "earthing": "Earthing System",
+        }
+        for cat, kws in self.matcher_service.PRODUCT_KEYWORDS.items():
+            for kw in kws:
+                if kw in text_lower:
+                    detected_product = PRODUCT_DISPLAY_NAMES.get(kw, kw.title())
+                    break
+            if detected_product:
+                break
+
         scored_candidates = []
         for std, semantic_score in sim_scores:
             s_entity = 0.0
@@ -122,13 +242,22 @@ class RecommendationEngineService:
                 if ref["normalized_is"] == std["is_number"] and std.get("status") == "Current":
                     s_entity = 1.0
                     is_direct_target = True
-                # Direct active replacement of a cited superseded standard
+                # Direct active replacement of a cited superseded standard (same base number)
                 elif ref.get("base_number") == std.get("base_number") and std.get("status") == "Current":
                     s_entity = 1.0
                     is_direct_target = True
-                elif std.get("replaces") and ref["normalized_is"] in std.get("replaces"):
+                elif std.get("replaces") and ref["normalized_is"] in str(std.get("replaces")):
                     s_entity = 1.0
                     is_direct_target = True
+                # Cross-base replacement: withdrawn standard superseded_by points to this std
+                elif ref.get("discrepancy_type") == "WITHDRAWN_STANDARD" and std.get("status") == "Current":
+                    # Check if this standard's notes or replaces mentions the withdrawn one
+                    std_notes = std.get("notes", "").lower()
+                    std_replaces = str(std.get("replaces", "")).lower()
+                    ref_base = ref.get("base_number", "").lower().replace(" ", "")
+                    if ref_base in std_notes or ref_base in std_replaces or ref["normalized_is"].lower().replace(" ", "")[:10] in std_notes:
+                        s_entity = 1.0
+                        is_direct_target = True
                 elif ref["normalized_is"] == std["is_number"]:
                     s_entity = 0.6
 
