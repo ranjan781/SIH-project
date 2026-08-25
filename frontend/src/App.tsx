@@ -33,9 +33,9 @@ export function App() {
       try { return JSON.parse(saved); } catch {}
     }
     return {
-      name: 'Er. Sachin Gupta',
-      role: 'Chief Procurement Verification Officer',
-      department: 'CPWD Technical Office, New Delhi'
+      name: 'Rajesh Kumar',
+      role: 'Procurement Officer',
+      department: 'CPWD, New Delhi'
     };
   });
 
@@ -107,12 +107,19 @@ export function App() {
     setActiveTab('recommendation');
   };
 
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   const handleDecisionRecorded = (newEntry: AuditLogEntry) => {
     setAuditLogs(prev => [newEntry, ...prev]);
+    if (currentAnalysisResult) {
+      setCurrentAnalysisResult(prev => prev ? { ...prev, officer_decision: newEntry } : null);
+    }
+    setToastMessage(`Signoff decision (${newEntry.decision}) recorded by ${newEntry.officer_name}`);
+    setTimeout(() => setToastMessage(null), 5000);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-[#f0f2f5] dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col selection:bg-slate-800 selection:text-white transition-colors duration-200">
       {/* Top Navigation Bar */}
       <Navbar
         activeTab={activeTab}
@@ -126,6 +133,18 @@ export function App() {
       />
 
       <DisclaimerBanner />
+
+      {toastMessage && (
+        <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 mt-3">
+          <div className="p-3.5 bg-emerald-600 text-white rounded-xl shadow-md flex items-center justify-between text-xs font-bold animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded bg-white/20">✓</span>
+              <span>{toastMessage}</span>
+            </div>
+            <button onClick={() => setToastMessage(null)} className="text-white/80 hover:text-white text-sm">✕</button>
+          </div>
+        </div>
+      )}
 
       {/* Main Page Content */}
       <main className="flex-1 max-w-[1520px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -164,7 +183,7 @@ export function App() {
             </p>
             <button
               onClick={() => setActiveTab('analyze')}
-              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+              className="mt-4 px-5 py-2.5 bg-[#182036] hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all shadow-sm"
             >
               Go to Tender Analysis Studio
             </button>
@@ -185,20 +204,20 @@ export function App() {
       </main>
 
       {/* Clean Enterprise Footer */}
-      <footer className="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+      <footer className="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-auto">
         <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <p className="font-bold text-slate-200">
+            <p className="text-sm font-bold text-slate-200">
               IS Standard Advisor • Public Procurement Verification Portal
             </p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Bureau of Indian Standards Public Procurement Intelligent Verification System
             </p>
           </div>
-          <div className="flex items-center space-x-4 text-[11px] font-medium">
+          <div className="flex items-center space-x-4 text-xs font-medium">
             <span>Logged in as: <strong className="text-slate-200 font-bold">{officerProfile.name}</strong> ({officerProfile.role})</span>
             <span>•</span>
-            <span className="text-blue-400 font-bold">Enterprise Procurement Bureau</span>
+            <span className="text-slate-300 font-bold">Enterprise Procurement Bureau</span>
           </div>
         </div>
       </footer>

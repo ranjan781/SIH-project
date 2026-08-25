@@ -94,6 +94,7 @@ export interface DocumentAnalysisResult {
   overall_confidence: number;
   summary_verdict: string;
   disclaimer: string;
+  officer_decision?: AuditLogEntry | null;
 }
 
 export interface AuditLogEntry {
