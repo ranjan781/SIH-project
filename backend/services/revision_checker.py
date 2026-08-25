@@ -63,6 +63,18 @@ class RevisionCheckerService:
         for s in self.standards:
             if self._normalize_key(s["is_number"]) == norm:
                 return s
+
+        # Fallback: if no year was supplied (e.g. "IS 383"), find the current
+        # edition from the base-number cluster so year-less citations resolve correctly.
+        base_norm = self._normalize_key(is_str.split(":")[0].strip())
+        cluster = self._standards_by_base_num.get(base_norm, [])
+        if cluster:
+            current_candidates = [s for s in cluster if s.get("status") == "Current"]
+            if current_candidates:
+                return sorted(current_candidates, key=lambda x: x.get("current_edition_year", 0), reverse=True)[0]
+            # Return latest even if not Current
+            return sorted(cluster, key=lambda x: x.get("current_edition_year", 0), reverse=True)[0]
+
         return None
 
     def find_active_replacement(self, std: Dict[str, Any]) -> Optional[Dict[str, Any]]:

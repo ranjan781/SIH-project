@@ -82,37 +82,38 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
     <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-fadeIn">
 
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-[14px] p-7 sm:p-[30px] border border-[#E1E4E8] dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#536586] dark:text-slate-300 border border-[#E1E4E8] dark:border-slate-700">
               BIS Standard Corpus
             </span>
-            <span className="text-xs text-slate-400 font-mono">bis_standards_dataset_expanded.csv</span>
+            <span className="text-xs text-[#536586] font-mono">bis_standards_dataset_expanded.csv</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
+          <h1 className="page-title text-[#182036] dark:text-white mt-1.5">
             Indian Standards (IS) Catalog Explorer
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+          <p className="body-text text-sm text-[#536586] dark:text-slate-400 mt-1">
             Search all {totalCount} indexed Indian Standards across 12 procurement sectors with live TF-IDF vector similarity.
           </p>
         </div>
 
-        <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 p-3 px-5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
+        <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 p-3 px-5 rounded-[12px] border border-[#E1E4E8] dark:border-slate-700 shrink-0">
           <div className="text-center">
-            <div className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">{totalCount}</div>
-            <div className="text-[10px] text-slate-500 font-bold uppercase">Standards</div>
+            <div className="text-2xl font-bold text-[#182036] dark:text-white font-mono">{totalCount}</div>
+            <div className="text-[10px] text-[#536586] font-semibold uppercase">Standards</div>
           </div>
-          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+          <div className="w-px h-8 bg-[#E1E4E8] dark:bg-slate-700"></div>
           <div className="text-center">
-            <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">12</div>
-            <div className="text-[10px] text-slate-500 font-bold uppercase">Sectors</div>
+            <div className="text-2xl font-bold text-[#182036] dark:text-white font-mono">12</div>
+            <div className="text-[10px] text-[#536586] font-semibold uppercase">Sectors</div>
           </div>
         </div>
       </div>
 
       {/* IS Number Lookup Box */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 rounded-[14px] p-7 sm:p-[30px] border border-[#E1E4E8] dark:border-slate-800 shadow-xs space-y-3">
+
         <div className="flex items-center gap-2">
           <Hash className="w-4 h-4 text-blue-600" />
           <h2 className="text-sm font-bold text-slate-900 dark:text-white">Direct IS Standard Lookup</h2>
@@ -130,7 +131,7 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
           <button
             onClick={handleIsLookup}
             disabled={isLookupLoading || !isLookupInput.trim()}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 disabled:opacity-50 transition-colors shadow-xs"
+            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-lg text-xs font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
           >
             {isLookupLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             Lookup
@@ -138,10 +139,10 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
         </div>
 
         {lookupResult && (
-          <div className={`p-4 rounded-xl border text-xs ${
+          <div className={`p-4 rounded-lg border text-xs ${
             lookupResult.found === false
               ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-              : 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800'
+              : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
           }`}>
             {lookupResult.found === false ? (
               <div className="flex items-center gap-2">
@@ -151,13 +152,13 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-slate-600 shrink-0" />
                   <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">{lookupResult.IS_number}</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                  <span className="px-2.5 py-0.5 rounded text-[11px] font-medium bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600">
                     {lookupResult.category}
                   </span>
                 </div>
-                <div className="font-bold text-slate-900 dark:text-slate-100">{lookupResult.title}</div>
+                <div className="font-semibold text-slate-900 dark:text-slate-100">{lookupResult.title}</div>
                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{lookupResult.scope_description}</p>
                 <div className="flex gap-4 pt-1 text-slate-500 flex-wrap">
                   <span>Version: <strong className="text-slate-800 dark:text-slate-200">{lookupResult.latest_version}</strong></span>
@@ -170,7 +171,7 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-96">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -178,7 +179,7 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search by IS number, product title, keyword..."
-            className="w-full pl-10 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+            className="w-full pl-10 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-slate-700 focus:outline-none"
           />
           {searchTerm && (
             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -191,7 +192,7 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
           <select
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
-            className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 font-medium text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+            className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 font-medium text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-slate-700 focus:outline-none"
           >
             <option value="all">All 12 Sectors</option>
             {CSV_CATEGORIES.map(cat => (
@@ -201,12 +202,12 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
 
           <button
             onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}
-            className="text-xs px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-700 dark:text-slate-300 flex items-center gap-1.5 hover:bg-slate-200 transition-colors font-medium"
+            className="text-xs px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-700 dark:text-slate-300 flex items-center gap-1.5 hover:bg-slate-200 transition-colors font-medium border border-slate-200 dark:border-slate-700"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Reset
           </button>
 
-          {isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+          {isLoading && <Loader2 className="w-4 h-4 animate-spin text-slate-600" />}
         </div>
       </div>
 
@@ -218,10 +219,10 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
             <button
               key={cat}
               onClick={() => setSelectedCategory(isSelected ? 'all' : cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                 isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               {cat}
@@ -229,6 +230,7 @@ export const StandardsExplorerView: React.FC<StandardsExplorerViewProps> = () =>
           );
         })}
       </div>
+
 
       {/* Table Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">

@@ -24,11 +24,15 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
   onDecisionRecorded,
   officerProfile
 }) => {
+  const targetStandard = analysisResult.primary_recommendation?.is_number
+    || analysisResult.referenced_standards[0]?.normalized_is
+    || "IS-RECOMMENDED";
+
   const [officerName, setOfficerName] = useState<string>(officerProfile.name);
   const [officerRole, setOfficerRole] = useState<string>(officerProfile.role);
   const [decision, setDecision] = useState<'ACCEPTED' | 'FLAGGED_FOR_REVIEW' | 'REJECTED'>('ACCEPTED');
   const [remarks, setRemarks] = useState<string>(
-    `Verified technical specifications for ${analysisResult.detected_product}. Upgraded citation to ${analysisResult.primary_recommendation?.is_number} under mandatory BIS QCO compliance.`
+    `Verified technical specifications for ${analysisResult.detected_product}. Compliance determination (${decision}) recorded for ${targetStandard} under statutory BIS guidelines.`
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -40,25 +44,36 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
     try {
       const entry = await ApiService.recordOfficerDecision({
         analysis_id: analysisResult.analysis_id,
-        standard_id: analysisResult.primary_recommendation?.is_number || "IS-RECOMMENDED",
+        standard_id: targetStandard,
         decision: decision,
         officer_name: officerName,
         officer_role: officerRole,
         remarks: remarks
       });
 
-      if (decision === 'ACCEPTED') {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.6 }
-        });
+      // Ensure fields match current analysis
+      entry.document_name = analysisResult.document_name;
+      entry.tender_ref = analysisResult.tender_ref || "TENDER/REC/VERIFIED";
+      entry.detected_product = analysisResult.detected_product;
+      entry.recommended_standard = targetStandard;
+
+      try {
+        if (decision === 'ACCEPTED' && typeof confetti === 'function') {
+          confetti({
+            particleCount: 60,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+      } catch (e) {
+        // Confetti optional
       }
 
       setIsSubmitting(false);
       onDecisionRecorded(entry);
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Failed to record officer decision", err);
       setIsSubmitting(false);
       onClose();
     }
@@ -88,9 +103,9 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
           {/* Target Standard Summary */}
           <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Recommended Standard</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Target Standard</span>
             <p className="font-mono font-bold text-sm text-slate-900 dark:text-white">
-              {analysisResult.primary_recommendation?.is_number}
+              {targetStandard}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">{analysisResult.detected_product}</p>
           </div>

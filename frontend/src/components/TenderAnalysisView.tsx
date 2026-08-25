@@ -119,36 +119,36 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
     <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-fadeIn">
       
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-[14px] p-7 sm:p-[30px] border border-[#E1E4E8] dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800">
-              Procurement Audit Studio
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#536586] dark:text-slate-300 border border-[#E1E4E8] dark:border-slate-700">
+              Procurement Verification Studio
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
+          <h1 className="page-title text-[#182036] dark:text-white mt-1.5">
             Tender Specification Analysis
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+          <p className="body-text text-sm text-[#536586] dark:text-slate-400 mt-1">
             Extract parameters, detect referenced Indian Standards (IS), and check active edition compliance against the 152-standard BIS catalog.
           </p>
         </div>
 
-        {/* Presets Dropdown */}
+        {/* Template Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">Sample Preset:</span>
+          <span className="text-xs font-medium text-[#536586] dark:text-slate-400 shrink-0">Specification Template:</span>
           <select
-            className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 font-medium text-slate-800 dark:text-slate-200 focus:ring-1 focus:ring-blue-600 focus:outline-none"
+            className="text-xs bg-slate-50 dark:bg-slate-800 border border-[#E1E4E8] dark:border-slate-700 rounded-lg px-3 py-2 font-medium text-[#182036] dark:text-slate-200 focus:ring-1 focus:ring-slate-700 focus:outline-none"
             onChange={(e) => {
               const s = sampleTenders.find(t => t.id === e.target.value);
               if (s) handleSelectSample(s);
             }}
             defaultValue={selectedSample?.id || ""}
           >
-            <option value="" disabled>Load a realistic tender...</option>
+            <option value="" disabled>Load specification template...</option>
             {sampleTenders.map(s => (
               <option key={s.id} value={s.id}>
-                {s.category}: {s.title.substring(0, 34)}...
+                {s.category}: {s.title.substring(0, 40)}
               </option>
             ))}
           </select>
@@ -159,14 +159,15 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Input Card (7 Cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-[14px] p-7 sm:p-[30px] border border-[#E1E4E8] dark:border-slate-800 shadow-xs space-y-5">
+
           {/* Mode Tabs */}
           <div className="flex border-b border-slate-200 dark:border-slate-800 gap-4">
             <button
               onClick={() => setInputMode('paste')}
-              className={`pb-3 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+              className={`pb-3 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
                 inputMode === 'paste'
-                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-white font-bold'
                   : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
@@ -175,9 +176,9 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
             </button>
             <button
               onClick={() => setInputMode('upload')}
-              className={`pb-3 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+              className={`pb-3 text-xs font-semibold border-b-2 transition-all flex items-center gap-2 ${
                 inputMode === 'upload'
-                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  ? 'border-slate-900 text-slate-900 dark:border-slate-100 dark:text-white font-bold'
                   : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
@@ -185,6 +186,7 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
               <span>Upload Document (PDF / DOCX)</span>
             </button>
           </div>
+
 
           {/* Error Banner */}
           {errorMessage && (
@@ -316,26 +318,26 @@ export const TenderAnalysisView: React.FC<TenderAnalysisViewProps> = ({
             <button
               onClick={handleRunAnalysis}
               disabled={isAnalyzing}
-              className={`w-full py-3 px-5 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-2 shadow-sm transition-all ${
+              className={`w-full py-3 px-5 rounded-lg font-semibold text-xs text-white dark:text-slate-900 flex items-center justify-center gap-2 shadow-xs transition-colors ${
                 isAnalyzing
-                  ? 'bg-slate-700 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                  ? 'bg-slate-700 dark:bg-slate-700 cursor-not-allowed text-white'
+                  : 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-slate-200'
               }`}
             >
               {isAnalyzing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                  <RefreshCw className="w-4 h-4 animate-spin" />
                   <span>Processing Verification Pipeline...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-blue-200" />
-                  <span>Run Standards Verification & Recommendation</span>
-                  <ArrowRight className="w-4 h-4 text-blue-200" />
+                  <span>Run Standards Verification</span>
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </div>
+
         </div>
 
         {/* Pipeline Stepper (5 Cols) */}
